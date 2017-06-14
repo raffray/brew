@@ -1,0 +1,35 @@
+
+make "vbr fix" part of Wipe function?
+
+list processing...
+
+in case of backup, if there is a fail... we quit?
+
+*** DOING
+** re-factoring frame/frameList
+   * changing names into frame.c --> id3v2_frame.c
+   * using the generic_list model to push frames into a linked list
+   * storing the strings into frame-types instead of using offset from file
+
+   * redispatch set_/get_ functions
+   * rename get_tag_... into get_id3v2Tag_...
+
+   * TXXX frames with '00' in the middle of string????
+   * APIC frames... we need to make sure all strings are compatible for renaming
+   *  same for file renaming. some characters are forbiden.
+
+   * Frames and tag flags
+     in case of nsynchronisation
+     all "FF 00" to be replaced by FF ????? at least in picture data in APIC frame
+         %11111111 00000000 111xxxxx  should be reverted back to  %11111111 111xxxxx
+
+   * restore, "SELECT" mode, if no frame is dumped we should not even dump the tag Header!!!!!
+     I don't like the way the frame dumping is done.
+     Better dump the tag in a buffer (max-size == size of original tag)
+	 and then dump buffer.
+
+	* Add error-code system
+
+** DONE
+** rename function **
+   removing the TYER field; useless for compilations where tracks of same album have different year

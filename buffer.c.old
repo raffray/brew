@@ -1,0 +1,219 @@
+#include <inttypes.h>
+#include "buffer.h"
+#include "byte.h"
+#include "extern.h"
+#include "str.h"
+#include "err.h"
+
+#define MIN_BUFF_SIZE 256
+
+UC checkBufferSize(buffer_t *buf, U4 dataSize)   // dataSize is the size of data we want to write
+{ U4 neededSize;
+//  char *tmp;
+//  printf("+++++ 1 +++++++ %d %d %d\n", buffer_tell(buf), dataSize, buf->size);
+  if(dataSize> MAX32 - buffer_tell(buf))   return FAILURE;
+  neededSize   =       buffer_tell(buf) + dataSize;
+//  printf("+++++ 2 +++++++ %d %d %d %d\n", buffer_tell(buf), dataSize, buf->size, neededSize);
+  buf->toSync  = true;
+//printf("A\n");
+  if (neededSize <= buf->  size)           return SUCCESS;  // no modification
+//printf("B\n");
+  buf->  size  =     neededSize;
+  if (neededSize <= buf->bufferSize)       return SUCCESS;
+//printf("C\n");
+  if (neededSize <= (MAX32 >> 1)   )
+    {
+//printf("D\n");
+ buf->bufferSize = neededSize<<1; }
+  else                             
+    {//printf("E\n");
+      buf->bufferSize = MAX32; }
+  //  buf->data = realloc(buf->data,     buf->bufferSize);
+//printU4(buf->data,NL);
+  buf->data = realloc(buf->data,     buf->bufferSize);
+  
+//printU4(buf->data,NL);
+//  if(!buf->data) printf("+++-----------+++++++++++++\n");
+  return SUCCESS;
+}
+/*
+UC checkBufferBounds(buffer_t *buf, U4 dataSize)   // dataSize is the size of data we want to write
+{ if(buffer_tell(buf)+dataSize > buf->size)   return FAILURE;
+                                            return SUCCESS; }
+*/
+char *get_buffer_string(buffer_t *buf)   { return buf->data; }
+U4    get_buffer_size  (buffer_t *buf)   { return buf->size; }
+
+VD buffer_open2(buffer_t *buf, char **data, U4 size)
+{ buf->      size = size;
+  buf->bufferSize = size;
+  buf->      data = *data;
+  buf->    cursor = 0;
+  buf->    toSync = false; }
+
+VD buffer_open(buffer_t *buf, char *data, U4 size)
+{//   printf("====================== 2 = %d\n", size);
+buf->      size = size;
+  buf->bufferSize = size;
+  buf->      data = data;
+  buf->    cursor = 0;
+  buf->    toSync = false; }
+
+VD buffer_init(buffer_t *buf)
+{ buf->       size =  0;
+  buf-> bufferSize =  MIN_BUFF_SIZE;
+  buf->       data = malloc(  MIN_BUFF_SIZE);
+  memset(buf->data, 0, MIN_BUFF_SIZE); /* printf("< :) >\n"); */ 
+  buf->     cursor = 0;
+  buf->     toSync = false; }
+
+void buffer_print(buffer_t *buf)
+{ U4 i, j;
+  U4 nbLines   = buf->bufferSize/16; //  buf->size/16;
+  U4 remainder = buf->bufferSize%16; //  buf->size%16;
+//  printf("< %d > %d\n", buf->size, buf->bufferSize);
+
+  for(i=0; i<nbLines    ; i++)
+    { for(j=0; j<16       ; j++)   if((j+i      *16)<buf->size)   printUC(*(buf->data +j+i      *16), SP);  else fprintf(ostream, ".. ");  printf("\n"); }
+  for    (j=0; j<remainder; j++)   if((j+nbLines*16)<buf->size)   printUC(*(buf->data +j+nbLines*16), SP);  else fprintf(ostream, ".. ");  printf("\n\n");
+  /*  for(i=0; i<nbLines    ; i++)
+    { for(j=0; j<16       ; j++)   printUC(*(buf->data +j+i      *16), SP);   printf("\n"); }
+  for    (j=0; j<remainder; j++)   printUC(*(buf->data +j+nbLines*16), SP);   printf("\n\n");
+  */
+} 
+
+UC buffer_read(buffer_t *buf, void *str, U4 len)
+{
+  U4 avail;
+  U4 newCursor = buf->cursor + len; 
+  UC ret = SUCCESS;
+  // we will read len characters from buf->cursor.
+  // if buf->cursor + len > buf->size, we are attempting to read more characters than there are available.
+  // we will read all that's available and complete the rest with zeroes
+  //                                |                      |                    |
+  //                                cursor                 size                 newCursor
+
+  /*
+read 4 chars
+    buf of size 11
+    indexes go from 0 to 10
+    case 1: cursor==5
+    we will read at 5,6,7 and 8
+    newCursor==9
+    test1 --> 5 > 11? NO
+    test2 --> 9 > 11? NO
+    avail==4
+
+    case 2: cursor==7
+    we will read at 7,8,9 and 10
+    newCursor==11
+    test1 --> 7 > 11? NO
+    test2 --> 11 > 11? NO
+    avail==4
+
+    case 3: cursor==9
+    we would read at 9,10,11 and 12
+    newCursor==13
+    test1 --> 9 > 11? NO
+    test2 --> 13 > 11? YES
+    avail==11-9==2
+    we will read bytes 9 and 10, complete last 2 with zeros and return FAILURE
+
+    case 4: cursor==11
+    we would read at 11,12,13,14
+    newCursor==15
+    test1 --> 11 > 11? NO
+    test2 --> 15 > 11? NO
+    avail==11-11==0
+
+   */
+
+
+  memset(str, 0, len);
+
+  if( buf->cursor    > buf->size)   {                                   return FAILURE; }
+  if(   newCursor    > buf->size)   { avail = buf->size - buf->cursor;  ret  = FAILURE; }
+  else                                avail = len;
+
+  if(avail>0)
+    memcpy(str, buf->data + buf->cursor,  avail);
+
+  buf->cursor = newCursor; 
+  return ret;
+}
+
+UC buffer_readStr(buffer_t *buf, void *str, U4 len)   { UC ret = buffer_read(buf, str, len);                     return ret; }
+UC buffer_readU4 (buffer_t *buf, U4   *v          )   { UC ret = buffer_read(buf, v  , 4  );  *v = swapU4(*v);   return ret; }
+UC buffer_readU2 (buffer_t *buf, U2   *v          )   { UC ret = buffer_read(buf, v  , 2  );  *v = swapU2(*v);   return ret; }
+UC buffer_readUC (buffer_t *buf, UC   *v          )   { UC ret = buffer_read(buf, v  ,   1);                     return ret; }
+
+UC buffer_write(buffer_t *buf, void *str, U4 len)
+{
+//  printf("|||||||||| 1 ||||||||||\n");printU4(buf->data,NL);
+ if (checkBufferSize(buf, len) == FAILURE)   return pExit("buffer overflow!");
+//  printf("|||||||||| 2 ||||||||||\n");printU4(buf->data,NL);
+  memcpy(buf->data + buf->cursor, str, len);
+//  printf("|||||||||| 3 ||||||||||\n");printU4(buf->data,NL);
+  buf->cursor += len;
+
+  return SUCCESS;
+}
+
+UC buffer_writeStr(buffer_t *buf, void *str, U4 len)   {                  return buffer_write(buf, str, len); } 
+UC buffer_writeU4 (buffer_t *buf, U4 v             )   { v = swapU4(v);   return buffer_write(buf, &v ,   4); }
+UC buffer_writeU2 (buffer_t *buf, U2 v             )   { v = swapU2(v);   return buffer_write(buf, &v ,   2); }
+UC buffer_writeUC (buffer_t *buf, UC v             )   {                  return buffer_write(buf, &v ,   1); } 
+
+UC buffer_seek(buffer_t *buf, S4 offset, int origin) // <== handle better
+{ // seeking is always possible. Reading/wrting out of file bounds isn't!
+  switch(origin)
+    {
+    case SEEK_SET : buf->cursor = 0;           break;
+    case SEEK_END : buf->cursor = buf->size;   break;
+    default       :                            break;
+    }
+  buf->cursor += offset;
+  return SUCCESS;
+}
+
+U4 buffer_tell (buffer_t *buf)   { return buf->cursor; }
+
+UC resyncBuf(char *str, U4 *size) // <=== move to different file
+{
+  buffer_t buf;
+  U4 finalSize = *size;
+  U4  readPos = 0;
+  U4 writePos = 0; // UC res;
+  U4 bytes;
+
+  buffer_open(&buf, str, *size);  //printBuffer(&buf);
+  while(readPos<*size)
+    { buffer_seek(&buf, readPos, SEEK_SET);
+      buffer_readU4(&buf, &bytes);   readPos+=4;
+      // replace FF0000 with FF00
+      if     ((bytes&0xFFFFFF00) == 0xFF000000)   { buffer_seek(&buf, writePos, SEEK_SET);   buffer_writeU2(&buf, 0xFF00);            writePos+=2;   readPos--;   finalSize--; }
+      // replace %11111111 00000000 111xxxxx with %11111111 111xxxxx
+      else if((bytes&0xFFFFE000) == 0xFF00E000)   { buffer_seek(&buf, writePos, SEEK_SET);   buffer_writeUC(&buf, 0xFF);  
+	                                                                                     buffer_writeUC(&buf, (UC)(bytes>> 8));   writePos+=2;   readPos--;   finalSize--; }
+      else		                          { buffer_seek(&buf, writePos, SEEK_SET);   buffer_writeUC(&buf, (UC)(bytes>>24));   writePos++;    readPos-=3;               } }
+  *size = finalSize;
+  buffer_close(&buf);
+
+  return SUCCESS;
+}
+
+UC buffer_changeSize(buffer_t *buf, U4 newSize) // States that we only consider the first "newSize" bytes of the buffer
+{ if (newSize > buf->bufferSize)   return FAILURE;
+  buf->size = newSize;             return SUCCESS; }
+
+UC buffer_close(buffer_t *buf)
+{
+  buffer_seek(buf,0,SEEK_SET);
+//  printf("%d\n", buffer_tell(buf));
+// free(buf->data);
+  if(buf->size<100)  buffer_print(buf);
+  if(buf->toSync == true)  { buffer_seek(buf, 0, SEEK_END);  buffer_writeUC(buf, 0); buffer_seek(buf,-1,SEEK_CUR);  buf->size--; }
+  if(buf->size<100)  buffer_print(buf);
+
+  return SUCCESS;
+}
