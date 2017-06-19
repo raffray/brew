@@ -5,7 +5,7 @@
 #include "brew_types.h"
 
 void print_Txyz(mp3File_t *, U4);
-char *get_Txyz_string4rename(mp3File_t *, char *);
+UC *get_Txyz_string4rename(mp3File_t *, char *);
 //void print_Text_frame_(mp3File_t *, U4);
 void  setForRenameStr(mp3File_t *, U4, char **);
 

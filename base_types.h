@@ -11,11 +11,12 @@
 // for printing:  printf...  %"PRIu64"  and %"PRIu32"     or %"PRId32"...
 //                           %lu            %zu              %l
 #define U8 uint64_t
+#define S8  int64_t
 #define U4 uint32_t
 #define S4  int32_t
-#define U2 unsigned short
-#define UC unsigned char
-#define SC char
+#define U2 uint16_t
+#define UC uint8_t //unsigned char
+#define SC  int8_t //char
 
 #define VD void
 #define FL double

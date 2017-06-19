@@ -52,4 +52,9 @@ U4    dump_id3v2Tag(mp3File_t *);
 
 void extractPictures(mp3File_t *);
 
+void addFrametoBuf   (buffer_t *, U4, UC *, U4);
+void addFrametoBuf_UC(buffer_t *, U4, UC);
+
+
+
 #endif // ID3V2TAG_

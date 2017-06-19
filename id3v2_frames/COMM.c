@@ -30,9 +30,9 @@ The actual text         <full text string according to encoding>
 00000180   74 00 20 00 32 00 35 00 2C 00 20 00 31 00 39 00   t. .2.5.,. .1.9.
 00000190   38 00 34 00 00 00 00 00 00 00 00 00 00 00 00 00   8.4.............
 
-43 4F 4D 4D 00 00 00 3A 00 00                     
-C  O  M  M  
-01                               
+43 4F 4D 4D 00 00 00 3A 00 00
+C  O  M  M
+01
 65 6E 67
 e  n  g
 FF FE 00 00
@@ -54,8 +54,8 @@ typedef struct COMM_frame
 } COMM_frame_t;
 */
 
-UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb) 
-{ char              *data     = get_id3v2Tag_frame_data    (file, frameNb);
+UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
+{ UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4                 dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
  // buffer_t           data_buffer;
 // buffer_t           *data_buffer = get_id3v2Tag_frame_buffer(file, frameNb);
@@ -63,7 +63,7 @@ UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
 //  UC            enc; // text encoding
 //  char  *utf8_string;
   buffer_t *utf8_buf;
-  buffer_t buffin;
+//  buffer_t buffin;
   UC res;
 
   if(dataSize<4)   return false; // <== ??
@@ -72,18 +72,21 @@ UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
 //   buffer_readUC (&data_buffer, &enc);
 
       // the short description
-//  utf8_buf        = string_to_utf8(data+4, dataSize -4, true, enc);
+//  utf8_buf        = string_to_utf8_str(data+4, dataSize -4, true, enc);
+/*
   buffer_open   (&buffin, data+4, dataSize-4);
-  utf8_buf        = string_to_utf8(&buffin, true, *data);
-  res = strlen(utf8_buf->data);
-  
+  utf8_buf        = string_to_utf8_buf(&buffin, true, *data);
+  */
+  utf8_buf        = string_to_utf8_str(data+4, dataSize-4, true, *data);
+  res = (utf8_buf->data == 0); //strlen(utf8_buf->data);
+
   free (utf8_buf->data);
   free(utf8_buf);
-  
+
   return (res == 0);
 }
 
-void print_COMM(mp3File_t *file, U4 frameNb) 
+void print_COMM(mp3File_t *file, U4 frameNb)
 { //char              *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4                 dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
@@ -117,19 +120,19 @@ void print_COMM(mp3File_t *file, U4 frameNb)
   U4 secondZero = 0;
   */
 
-  
+
   if(dataSize<4) {   fprintf(ostream, "\n");/*error*/ }
   else
     {
 //      buffer_readU4 (buf, &firstU4);
 //      enc = (UC)(firstU4>>24);
 
-      // 01 65 6E 67 FF FE 00 00 FF FE 47 00 65 00 72 00 6D 00 61 00 6E 00 
-      //    e  n  g       
+      // 01 65 6E 67 FF FE 00 00 FF FE 47 00 65 00 72 00 6D 00 61 00 6E 00
+      //    e  n  g
       // buf --> 01 65 6E 67 00 47 65 72 6F 61 6E 00
       //
       // from 4th byte; we need to count 2 00
-      // if frame is properly formed, we should count EXACTLY 2 zeros       
+      // if frame is properly formed, we should count EXACTLY 2 zeros
 
 //      for(i=4; i<buf->size; i++)   { buffer_readUC(buf, &c);   if(c==0) break;}
 
@@ -139,19 +142,19 @@ void print_COMM(mp3File_t *file, U4 frameNb)
       // 2) find first nonZero character
 
 
-// ///// first 4 bytes of buf are the encoding and 3 bytes for language; example 
+// ///// first 4 bytes of buf are the encoding and 3 bytes for language; example
 
 
       //if first 0 encountered is the last of the string/buffer, there's only the short desc
 
 //      buffer_seek(buf, 4, SEEK_SET);
-//      lang_buf    = string_to_utf8_2(buf->data+4, buf->size -4, true, 0);
+//      lang_buf    = string_to_utf8_str(buf->data+4, buf->size -4, true, 0);
 
       /*
       buffer_seek(lang_buf, 0, SEEK_SET);
-      for(i=0; i<lang_buf->size; i++)   
+      for(i=0; i<lang_buf->size; i++)
 	{
-	  buffer_readUC(lang_buf, &c);   
+	  buffer_readUC(lang_buf, &c);
 	  printUC(c, NL);
 	  if(c==0)
 	    {
@@ -182,12 +185,12 @@ void print_COMM(mp3File_t *file, U4 frameNb)
 //      printf("[%s]\n", lang_buf->data+1);
 
 //      exit(42);
- 
+
       /*
      for(   ; i<buf->size; i++)   { buffer_readUC(buf, &c);   if(c==0) break;}
       end_str2 = i-1;
 
-      // 01 
+      // 01
 //      fprintf(ostream, "(%s)[%s]: %s", desc_string, lang_string, text_string);
       buffer_init(&buffout);
       buffer_writeUC(&buffout, 0x28);
@@ -202,13 +205,13 @@ void print_COMM(mp3File_t *file, U4 frameNb)
       buffer_readUC (&data_buffer, &enc);
       buffer_readStr(&data_buffer, langBytes, 3);
       buffer_close  (&data_buffer);
-      
-      lang_buf    = string_to_utf8(langBytes, 3, true, 0);
+
+      lang_buf    = string_to_utf8_str(langBytes, 3, true, 0);
       lang_string = lang_buf->data;
       free(lang_buf);
-      
+
       // the short description
-      utf8_buf        = string_to_utf8(data+4, dataSize -4, true, enc);
+      utf8_buf        = string_to_utf8_str(data+4, dataSize -4, true, enc);
 
 
 //	the buffer's data would be like:   31 32 33 00 54 65 73 74 00

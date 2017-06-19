@@ -24,7 +24,7 @@ Picture data    <binary data>
 
 #define REMAINING_BYTES(a)  (data + dataSize - (a))
 
-UC APIC_valid(char *data, U4 dataSize, apic_data_ *apic)
+UC APIC_valid(UC *data, U4 dataSize, apic_data_ *apic)
 { S4 len;
 
   apic->enc = data[0];
@@ -54,8 +54,8 @@ void print_APIC(mp3File_t *file, U4 frameNb)
   apic_data_ apic;
 
   if(APIC_valid(data, dataSize, &apic))
-    { fprintf(ostream, "(");                                            print_string2_(apic.desc_string_start, apic.desc_string_len, true, apic.enc );
-      fprintf(ostream, "), [%s, %d]: ", picType[apic.pic_type], apic.pic_type);   print_string2_(apic.mime_string_start, apic.mime_string_len, true, 0xFF);
+    { fprintf(ostream, "(");                                            print_string_str(apic.desc_string_start, apic.desc_string_len, true, apic.enc );
+      fprintf(ostream, "), [%s, %d]: ", picType[apic.pic_type], apic.pic_type);   print_string_str(apic.mime_string_start, apic.mime_string_len, true, 0xFF);
       fprintf(ostream, " , %d bytes", apic.pic_dataSize); }
 			*/
 			fprintf(ostream, "working on it");
@@ -63,7 +63,7 @@ void print_APIC(mp3File_t *file, U4 frameNb)
 
 
 void extract_APIC(mp3File_t *file, U4 frameNb)
-{ char *data     = get_id3v2Tag_frame_data    (file, frameNb);
+{ UC *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
   char *filename = get_filename(file);
   apic_data_ apic;

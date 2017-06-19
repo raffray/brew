@@ -25,7 +25,7 @@ VD  resetFile(char *);
 UC isNumber  (char *);
 UC isRegFile (char *);
 UC isDir     (char *);
-UC nodeExists(char *);
+UC nodeExists(UC *);
 UC isFlag    (char *);
 
 #endif // MIO_

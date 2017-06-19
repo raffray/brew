@@ -44,14 +44,14 @@ UC b_open(mp3File_t *file, char *filename)
   struct stat st;
   bstream_t *bs  = &(file->bs);
   buffer_t  *buf = &(bs ->buf);
-  char *data = NULL;
-  //  memset(bs, 0, sizeof(bstream_t));  
+  UC *data = NULL;
+  //  memset(bs, 0, sizeof(bstream_t));
   bs->toSync = false;
   if ( lstat(filename, &st) == 0)
     { pFile = fopen(filename, "r");
       if(!pFile)    return FAILURE; //pReturn(file, "fopen: could not open file!");
       rewind(pFile); // <=== useful?
-      
+
       data = malloc(st.st_size);
       if ( fread(data, 1, st.st_size, pFile) != st.st_size)   return FAILURE; // pReturn(file, "b_open: could not load file");
       fclose(pFile);
@@ -59,27 +59,27 @@ UC b_open(mp3File_t *file, char *filename)
       set_fileSize(file    , st.st_size);     // <== might want to limit filesize HERE
       buffer_open(buf, data, st.st_size); }
   else if(errno == ENOENT) // file needs to be created
-    { buffer_init(buf);
+    { buffer_init_default(buf);
       bs->toSync = true; }
   else   { fprintf(ostream, "b_open: could not stat file");   return FAILURE; }
-    
+
 //  scopy(&(bs->filename), filename); // why make a copy?
 
   return SUCCESS;
 }
 
-U4 get_bstreamSize(bstream_t *bs)            { return (&(bs->buf))->size;        }
-VD set_bstreamSize(bstream_t *bs, U4 size)   {        (&(bs->buf))->size = size; }
+U4 get_bstreamSize(bstream_t *bs)            { return (&(bs->buf))->usedSize;        }
+VD set_bstreamSize(bstream_t *bs, U4 size)   {        (&(bs->buf))->usedSize = size; }
 
 UC  b_readStr(bstream_t *bs, void *str, U4 len)   { return buffer_readStr(&(bs ->buf), str, len); }
 UC  b_readU4 (bstream_t *bs, U4   *v          )   { return buffer_readU4 (&(bs ->buf), v       ); }
 UC  b_readU2 (bstream_t *bs, U2   *v          )   { return buffer_readU2 (&(bs ->buf), v       ); }
 UC  b_readUC (bstream_t *bs, UC   *v          )   { return buffer_readUC (&(bs ->buf), v       ); }
 
-UC b_writeStr(bstream_t *bs, void *str, U4 len)   { return buffer_writeStr(&(bs ->buf),  str, len); } 
+UC b_writeStr(bstream_t *bs, void *str, U4 len)   { return buffer_writeStr(&(bs ->buf),  str, len); }
 UC b_writeU4 (bstream_t *bs, U4 v             )   { return buffer_writeU4 (&(bs ->buf),  v       ); }
 UC b_writeU2 (bstream_t *bs, U2 v             )   { return buffer_writeU2 (&(bs ->buf),  v       ); }
-UC b_writeUC (bstream_t *bs, UC v             )   { return buffer_writeUC (&(bs ->buf),  v       ); } 
+UC b_writeUC (bstream_t *bs, UC v             )   { return buffer_writeUC (&(bs ->buf),  v       ); }
 
 UC b_seek(bstream_t *bs, S4 offset, int origin)   { return buffer_seek(&(bs ->buf), offset, origin); }
 U4 b_tell(bstream_t *bs                       )   { return buffer_tell(&(bs ->buf)                ); }
@@ -90,10 +90,10 @@ UC b_close(bstream_t *bs, char *filename)
 
   if(bs == NULL)   return pExit("b_close failed, called on a NULL pointer");
   if((buf->toSync) || (bs->toSync))
-    {    pFile = fopen(filename, "w+"); 
+    {    pFile = fopen(filename, "w+");
       if(pFile == NULL)                                         return pExit("b_close: could not sync file");
 
-      if(fwrite(buf->data, 1, buf->size, pFile) != buf->size)   return pExit("b_close: could not sync file");
+      if(fwrite(buf->data, 1, buf->usedSize, pFile) != buf->usedSize)   return pExit("b_close: could not sync file");
       fclose(pFile); }
 
 //  free(bs->filename);

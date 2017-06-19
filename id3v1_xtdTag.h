@@ -17,12 +17,12 @@ end-time 	6 	the end of the music as mmm:ss
 
 typedef struct id3v1_xtdTag
 { UC presenceFlag;
-  char title     [61];
-  char artist    [61];
-  char album     [61];
-  char speed     [ 1];
-  char start_time[ 7];
-  char   end_time[ 7];
+  UC title     [61];
+  UC artist    [61];
+  UC album     [61];
+  UC speed     [ 1];
+  UC start_time[ 7];
+  UC   end_time[ 7];
 
 } id3v1_xtdTag_t;
 
@@ -38,4 +38,3 @@ UC print_id3v1_xtd_info(mp3File_t *);
 
 
 #endif // ID3V1_XTD_
-

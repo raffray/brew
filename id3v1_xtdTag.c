@@ -62,7 +62,7 @@ UC print_id3v1_xtdTag(mp3File_t *file)
   fprintf(ostream, "Album   : %s\n", tag->album);
 
   fprintf(ostream, "Speed   : ");
-  switch(atoi(tag->speed))
+  switch(atoi((char*)tag->speed))
     { case 0: fprintf(ostream, "Unset\n"); break;
     case 1: fprintf(ostream, "Slow\n"); break;
     case 2: fprintf(ostream, "Medium\n"); break;

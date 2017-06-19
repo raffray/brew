@@ -9,7 +9,7 @@ UC scopy(char **dest, const char *src)
   return SUCCESS;
 }
 
-U4 text_len(char *text, U4 limit, UC type)
+U4 text_len(UC *text, U4 limit, UC type)
 {  //printf("----> "); printU4(limit, NL);
   switch(type)
     {
@@ -19,7 +19,7 @@ U4 text_len(char *text, U4 limit, UC type)
     }
 }
 
-U4 text_len_1Byte(char *text, U4 limit) // returns the length of a string; if no 0x00 found up to limit, limit is the value returned
+U4 text_len_1Byte(UC *text, U4 limit) // returns the length of a string; if no 0x00 found up to limit, limit is the value returned
 // for string terminated by ONE '\0'
 { U4 i=0;
   UC exit = false;
@@ -47,7 +47,7 @@ U4 text_len_1Byte(char *text, U4 limit) // returns the length of a string; if no
   return i;
 }
 
-U4 text_len_2Bytes(char *text, U4 limit)
+U4 text_len_2Bytes(UC *text, U4 limit)
 { U4 i=0;
 
 //  printf("limit: %d || ", limit);
@@ -80,3 +80,7 @@ i+=2;
 
   return i;
 }
+
+int strcmp_(UC *s1, UC *s2)   { return strcmp((char*)s1, (char*)s2); }
+
+size_t strlen_ (UC *s)   { return strlen((char*)s); }

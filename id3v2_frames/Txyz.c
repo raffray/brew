@@ -1,6 +1,6 @@
 #include <ctype.h>
 #include "includes.h"
-#include "Txyz.h" 
+#include "Txyz.h"
 #include "id3v2Tag_frame.h"
 #include "mp3File.h"
 #include "extern.h"
@@ -20,7 +20,7 @@ Text encoding:
      $00   ISO-8859-1 [ISO-8859-1].                                 Terminated with $00.
      $01   UTF-16 [UTF-16] encoded Unicode [UNICODE] with BOM.      Terminated with $00 00.
      All strings in the same frame SHALL have the same byteorder.
-     
+
 Id3v2.4 ONLY
      $02   UTF-16BE [UTF-16] encoded Unicode [UNICODE] without BOM. Terminated with $00 00.
      $03   UTF-8 [UTF-8] encoded Unicode [UNICODE].                 Terminated with $00.
@@ -31,8 +31,8 @@ void print_Txyz(mp3File_t *file, U4 frameNb)
  // U4  dataSize   = get_id3v2Tag_frame_dataSize(file, frameNb);
   buffer_t * buf = get_id3v2Tag_frame_buffer  (file, frameNb);
 //printf("START PRINTING STRING\n");
-  print_string2(buf, false, 0);
-//printf("END   PRINTING STRING\n"); 
+  print_string_buf(buf, false, 0);
+//printf("END   PRINTING STRING\n");
 }
 
 
@@ -61,17 +61,17 @@ UC find_strID_index(mp3File_t *file, char *strID, U4 *index)
   return FAILURE; // strID not found
 }
 
-char *get_Txyz_string4rename(mp3File_t *file, char *strID)
+UC *get_Txyz_string4rename(mp3File_t *file, char *strID)
 {
   U4     index;
-  char   *data;
+  UC   *data;
   U4  dataSize;
 
   buffer_t *buf;
-  char *bufString;
+  UC *bufString;
   U4 firstZero;
 
-  char *str;
+  UC *str;
 
   if (find_strID_index(file, strID, &index) == FAILURE)   return NULL;
 
@@ -79,16 +79,16 @@ char *get_Txyz_string4rename(mp3File_t *file, char *strID)
   dataSize = get_id3v2Tag_frame_dataSize(file, index);
 
 
-  buf = string_to_utf8_2(data, dataSize, false, 0);
+  buf = string_to_utf8_str(data, dataSize, false, 0);
   bufString = buf->data;
   //  trackName = get_Txyz_string(data, dataSize, false, 0);
-  firstZero = strlen(bufString);
+  firstZero = strlen_(bufString);
 
   // We are working on a string already in utf-8 format
 
   // if we have a multi string... consider only the first one.
   // replace all non-allowed characters by '_'
-  // List of such characters:  /  
+  // List of such characters:  /
 
   buffer_seek(buf, 0, SEEK_SET);
   while(buffer_tell(buf)<=firstZero)

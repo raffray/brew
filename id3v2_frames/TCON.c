@@ -1,6 +1,6 @@
 #include <ctype.h>
 #include "includes.h"
-#include "Txyz.h" 
+#include "Txyz.h"
 #include "id3v2Tag_frame.h"
 #include "mp3File.h"
 #include "extern.h"
@@ -16,15 +16,15 @@
     Information    <text string according to encoding>
 
 // id3v2.3 specs
-   The 'Content type', which previously was stored as a one byte numeric value only, is now a numeric string. 
-   You may use one or several of the types as ID3v1.1 did or, since the category list would be impossible to 
+   The 'Content type', which previously was stored as a one byte numeric value only, is now a numeric string.
+   You may use one or several of the types as ID3v1.1 did or, since the category list would be impossible to
    maintain with accurate and up to date categories, define your own.
 
-    References to the ID3v1 genres can be made by, as first byte, enter "(" followed by a number from the genres 
-    list (appendix A) and ended with a ")" character. This is optionally followed by a refinement, e.g. "(21)" or 
-    "(4)Eurodisco". Several references can be made in the same frame, e.g. "(51)(39)". If the refinement should 
-    begin with a "(" character it should be replaced with "((", e.g. "((I can figure out any genre)" 
-    or "(55)((I think...)". The following new content types is defined in ID3v2 and is implemented in the same way 
+    References to the ID3v1 genres can be made by, as first byte, enter "(" followed by a number from the genres
+    list (appendix A) and ended with a ")" character. This is optionally followed by a refinement, e.g. "(21)" or
+    "(4)Eurodisco". Several references can be made in the same frame, e.g. "(51)(39)". If the refinement should
+    begin with a "(" character it should be replaced with "((", e.g. "((I can figure out any genre)"
+    or "(55)((I think...)". The following new content types is defined in ID3v2 and is implemented in the same way
     as the numeric content types, e.g. "(RX)".
 
     RX    Remix
@@ -41,15 +41,15 @@
 */
 
 // 22 is the maximum length of strings. for: 140. Contemporary Christian
-UC tconArray[256][22]={"Blues"                 , "Classic Rock"         , "Country"          , "Dance"           , "Disco"          , 
+UC tconArray[256][22]={"Blues"                 , "Classic Rock"         , "Country"          , "Dance"           , "Disco"          ,
 		       "Funk"                  , "Grunge"               , "Hip-Hop"          , "Jazz"            , "Metal"          ,
-		       "New Age"               , "Oldies"               , "Other"            , "Pop"             , "R&B"            , 
+		       "New Age"               , "Oldies"               , "Other"            , "Pop"             , "R&B"            ,
 		       "Rap"                   , "Reggae"               , "Rock"             , "Techno"          , "Industrial"     ,
-		       "Alternative"           , "Ska"                  , "Death Metal"      , "Pranks"          , "Soundtrack"     , 
+		       "Alternative"           , "Ska"                  , "Death Metal"      , "Pranks"          , "Soundtrack"     ,
 		       "Euro-Techno"           , "Ambient"              , "Trip-Hop"         , "Vocal"           , "Jazz+Funk"      ,
-		       "Fusion"                , "Trance"               , "Classical"        , "Instrumental"    , "Acid"           , 
+		       "Fusion"                , "Trance"               , "Classical"        , "Instrumental"    , "Acid"           ,
 		       "House"                 , "Game"                 , "Sound Clip"       , "Gospel"          , "Noise"          ,
-		       "AlternRock"            , "Bass"                 , "Soul"             , "Punk"            , "Space"          , 
+		       "AlternRock"            , "Bass"                 , "Soul"             , "Punk"            , "Space"          ,
 		       "Meditative"            , "Instrumental Pop"     , "Instrumental Rock", "Ethnic"          , "Gothic"         ,
 		       "Darkwave"              , "Techno-Industrial"    , "Electronic"       , "Pop-Folk"        , "Eurodance"      ,
 		       "Dream"                 , "Southern Rock"        , "Comedy"           , "Cult"            , "Gangsta"        ,
@@ -69,7 +69,7 @@ UC tconArray[256][22]={"Blues"                 , "Classic Rock"         , "Count
 		       "Dance Hall"            , "Goa"                  , "Drum & Bass"      , "Club-House"      , "Hardcore"       ,
 		       "Terror"                , "Indie"                , "BritPop"          , "Afro-Punk"       , "Polsk Punk"     ,
 		       "Beat"                  , "Christian Gangsta Rap", "Heavy Metal"      , "Black Metal"     , "Crossover"      ,
-		       "Contemporary Christian", "Christian Rock"       , "Merengue"         , "Salsa"           , "Thrash Metal"   , 
+		       "Contemporary Christian", "Christian Rock"       , "Merengue"         , "Salsa"           , "Thrash Metal"   ,
 		       "Anime"                 , "JPop"                 , "Synthpop"         , "Abstract"        , "Art Rock"       ,
 		       "Baroque"               , "Bhangra"              , "Big Beat"         , "Breakbeat"       , "Chillout"       ,
 		       "Downtempo"             , "Dub"                  , "EBM"              , "Eclectic"        , "Electro"        ,
@@ -97,21 +97,21 @@ UC tconArray[256][22]={"Blues"                 , "Classic Rock"         , "Count
 // 'CR' = Cover // not supported
 // 'RX' = Remix // not supported
 
-//buffer_t *string_to_utf8(char *str, U4 len, UC type_known, UC type_given); // <====
+//buffer_t *string_to_utf8_str(char *str, U4 len, UC type_known, UC type_given); // <====
 
 void print_TCON2(mp3File_t *file, U4 frameNb) // mseek already performed by print_Txxx_frame
 { buffer_t *buffer = get_id3v2Tag_frame_buffer    (file, frameNb);
 //  char     *data = get_id3v2Tag_frame_data    (file, frameNb);
 //  U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
-  print_string2(buffer, false, 0);
+  print_string_buf(buffer, false, 0);
 }
 
 void print_TCON(mp3File_t *file, U4 frameNb) // mseek already performed by print_Txxx_frame
-{ char                  *data = get_id3v2Tag_frame_data    (file, frameNb);
+{ UC                  *data = get_id3v2Tag_frame_data    (file, frameNb);
   U4                 dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
-//  buffer_t *buffer = string_to_utf8(data, dataSize, false, 0);
+//  buffer_t *buffer = string_to_utf8_str(data, dataSize, false, 0);
 
   /*
   // id3v2.3 examples
@@ -128,7 +128,7 @@ void print_TCON(mp3File_t *file, U4 frameNb) // mseek already performed by print
   21 \0 my genre \0
   */
 
-  // string will be a sequence of 
+  // string will be a sequence of
   print_string(data, dataSize, false, 0); //printf("%s\n", buffer->data);
 
   //free(buffer);

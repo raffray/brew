@@ -18,11 +18,11 @@ genre 	1 	Index in a list of genres, or 255
 */
 typedef struct id3v1Tag
 { UC presenceFlag;
-  char title  [31];
-  char artist [31];
-  char album  [31];
-  char year   [ 5];
-  char comment[31];
+  UC title  [31];
+  UC artist [31];
+  UC album  [31];
+  UC year   [ 5];
+  UC comment[31];
   UC  flag;
   UC track;
   UC genre;
@@ -36,4 +36,3 @@ UC print_id3v1Tag           (mp3File_t *);
 
 
 #endif // ID3V1_
-

@@ -97,7 +97,7 @@ UC selectFrames_desc[NB_SELECT_FRAMES][13] = { "Title"    , "Artist"    , "Album
 
 id3v2Tag_frameLink_t *get_id3v2Tag_frame                 (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frameList(file)->ptrList[idx];              }
 U4                    get_id3v2Tag_frame_frameID         (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->frameID;                  }
-U4                    get_id3v2Tag_frame_dataSize        (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->size;                 }
+U4                    get_id3v2Tag_frame_dataSize        (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->usedSize;                 }
 U4                    get_id3v2Tag_frame_compression_flag(mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->compression_flag; }
 U4                    get_id3v2Tag_frame_decompressedSize(mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->decompressedSize; }
 U4                    get_id3v2Tag_frame_encryption_flag (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)-> encryption_flag; }
@@ -106,7 +106,7 @@ U4                    get_id3v2Tag_frame_grouping_flag   (mp3File_t *file, U4 id
 U4                    get_id3v2Tag_frame_groupID         (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->         groupID; }
 U4                    get_id3v2Tag_frame_dataLength_flag (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)-> dataLength_flag; }
 U4                    get_id3v2Tag_frame_dataLength      (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->      dataLength; }
-SC                   *get_id3v2Tag_frame_data            (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->data;                    }
+UC                   *get_id3v2Tag_frame_data            (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->data;                    }
 buffer_t             *get_id3v2Tag_frame_buffer          (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf;                    }
 
 
@@ -145,8 +145,8 @@ U4 retrieve_id3v2Tag_frame(mp3File_t *file, buffer_t *tagBuffer)
   U4    frameID;
   U4  frameSize = 0;
   U4       size;
-  U4    tagDataSize = tagBuffer->size;
-  char *frameData;
+  U4    tagDataSize = tagBuffer->usedSize;
+  UC *frameData;
   U4    frameDataSize;
   buffer_t *frameBuffer;
   UC tagVersion = get_id3v2Tag_version(file);
@@ -231,11 +231,11 @@ U4 dump_id3v2Tag_frame(mp3File_t *file, buffer_t *tagBuffer, U4 i)
 	    else
 	      { // The frame-header
 		buffer_writeU4(tagBuffer, frame->frameID);
-		buffer_writeU4(tagBuffer, set_id3v2Tag_frameSize(frame->buf->size, 4));
+		buffer_writeU4(tagBuffer, set_id3v2Tag_frameSize(frame->buf->usedSize, 4));
 		buffer_writeU2(tagBuffer, 0); // flags
 
 		// The frame
-		buffer_writeStr(tagBuffer, frame->buf->data, frame->buf->size); // printU4str(frame->frameID, SP); printf("%d\n", frame->dataSize);
+		buffer_writeStr(tagBuffer, frame->buf->data, frame->buf->usedSize); // printU4str(frame->frameID, SP); printf("%d\n", frame->dataSize);
 	      }
 	  }
 
@@ -245,7 +245,7 @@ U4 dump_id3v2Tag_frame(mp3File_t *file, buffer_t *tagBuffer, U4 i)
 	  }
       }
 
-  return frame->buf->size;;
+  return frame->buf->usedSize;
 }
 
 /*

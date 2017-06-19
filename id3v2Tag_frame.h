@@ -73,7 +73,7 @@ U4    get_id3v2Tag_frame_grouping_flag        (mp3File_t *, U4);
 U4    get_id3v2Tag_frame_groupID              (mp3File_t *, U4);
 U4    get_id3v2Tag_frame_dataLength_flag      (mp3File_t *, U4);
 U4    get_id3v2Tag_frame_dataLength           (mp3File_t *, U4);
-char *get_id3v2Tag_frame_data           (mp3File_t *, U4);
+UC   *get_id3v2Tag_frame_data           (mp3File_t *, U4);
 buffer_t *get_id3v2Tag_frame_buffer     (mp3File_t *, U4);
 
 UC process_id3v2Tag_frame_flags   (mp3File_t *, frame_info_t *, buffer_t *, U4,  UC);

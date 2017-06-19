@@ -74,7 +74,7 @@ void retrieve_id3v2Tag_frameList(mp3File_t *file)
   id3v2Tag_frameList_t *list  = get_id3v2Tag_frameList(file);
 
   U4  frameSize = 0;
-  char *tagData;
+  UC *tagData;
   U4    tagDataSize;
   UC tagVersion = get_id3v2Tag_version(file);
   U4        xhs = get_id3v2Tag_xtdHdr_size(file);

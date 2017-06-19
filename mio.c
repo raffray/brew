@@ -34,9 +34,9 @@ UC isRegFile(char *fname) // implies that node exists
 {
   int status;
   struct stat st_buf;
-  
+
   status = lstat(fname, &st_buf);
-  if (status != 0)              return false; // printf ("Error, errno = %d\n", errno); 
+  if (status != 0)              return false; // printf ("Error, errno = %d\n", errno);
   if (S_ISREG (st_buf.st_mode)) return  true;
   return false;
 }
@@ -45,21 +45,21 @@ UC isDir(char *name) // implies that node exists
 {
   int status;
   struct stat st_buf;
-  
+
   status = lstat (name, &st_buf);
   if (status != 0)              return false; // printf ("Error, errno = %d\n", errno);
   if (S_ISDIR (st_buf.st_mode)) return  true;
   return false;
 }
 
-UC nodeExists(char *fname)
+UC nodeExists(UC *fname)
 {
   /*
   FILE *file = fopen(fname, "r");
   if (file != NULL)   { fclose(file);   return true; }
   return false;
   */
-  if(access(fname, F_OK)==0) return true;
+  if(access((char *)fname, F_OK)==0) return true;
   return false;
 }
 

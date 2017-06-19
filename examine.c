@@ -15,7 +15,7 @@
 
 UC         printMode = ALL;     // ALL for everything, SELECT for only the track's length
 
-buffer_t *makeV2fromV1Tag(mp3File_t *);
+//buffer_t *makeV2fromV1Tag(mp3File_t *);
 
 UC print_tags(fileLink_t *link)
 { mp3File_t mpFile;

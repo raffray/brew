@@ -8,12 +8,12 @@
 
 #include "fileList.h"
 
-UC  mreadStr(mp3File_t *file, char *str,      U4 len)   { if (file->streamType == FSTREAM)   return f_readStr(&(file->fs), str,  len);     else   return b_readStr(&(file->bs), str, len);    }
+UC  mreadStr(mp3File_t *file  , UC *str,      U4 len)   { if (file->streamType == FSTREAM)   return f_readStr(&(file->fs), str,  len);     else   return b_readStr(&(file->bs), str, len);    }
 UC  mreadU4 (mp3File_t *file  , U4             *v   )   { if (file->streamType == FSTREAM)   return f_readU4 (&(file->fs),         v);     else   return b_readU4(&(file->bs), v);            }
 UC  mreadU2 (mp3File_t *file  , U2             *v   )   { if (file->streamType == FSTREAM)   return f_readU2 (&(file->fs),         v);     else   return b_readU2(&(file->bs), v);            }
 UC  mreadUC (mp3File_t *file  , UC             *v   )   { if (file->streamType == FSTREAM)   return f_readUC (&(file->fs),         v);     else   return b_readUC(&(file->bs), v);            }
 
-UC mwriteStr(mp3File_t *file, char *str,      U4 len)   { if (file->streamType == FSTREAM)   return f_writeStr(&(file->fs), str, len);     else   return b_writeStr(&(file->bs), str, len);   }
+UC mwriteStr(mp3File_t *file, UC *str,        U4 len)   { if (file->streamType == FSTREAM)   return f_writeStr(&(file->fs), str, len);     else   return b_writeStr(&(file->bs), str, len);   }
 UC mwriteU4 (mp3File_t *file, U4                   v)   { if (file->streamType == FSTREAM)   return f_writeU4(&(file->fs),         v);     else   return b_writeU4(&(file->bs), v);           }
 UC mwriteU2 (mp3File_t *file, U2                   v)   { if (file->streamType == FSTREAM)   return f_writeU2(&(file->fs),         v);     else   return b_writeU2(&(file->bs), v);           }
 UC mwriteUC (mp3File_t *file, UC                   v)   { if (file->streamType == FSTREAM)   return f_writeUC(&(file->fs),         v);     else   return b_writeUC(&(file->bs), v);           }

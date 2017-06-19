@@ -2,17 +2,21 @@
 #include "extern.h"
 #include "filename.h"
 #include "mio.h"
+#include "str.h"
 #include "buffer.h"
 
 VD buffer_append(buffer_t *buf, char *str, UC slash)
+{ buffer_append_(buf, (UC *)str, slash); }
+
+VD buffer_append_(buffer_t *buf, UC *str, UC slash)
 {
   if(str!=NULL)
-    { buffer_writeStr(buf, str, strlen(str)); 
+    { buffer_writeStr(buf, str, strlen_(str));
       if(slash)   buffer_writeUC(buf, '/');
       buffer_close(buf); }
 }
 
-UC filename_check(buffer_t *buf, char *extention) 
+UC filename_check(buffer_t *buf, char *extention)
 { // if filename already exists, find the first "filename (xx).mp3" available
   UC i;
   char str[11];

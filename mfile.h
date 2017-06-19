@@ -13,12 +13,12 @@
 typedef struct mp3File mp3File_t;
 
 
-UC  mreadStr(mp3File_t *file, char *str, U4 len);
+UC  mreadStr(mp3File_t *file  , UC *str, U4 len);
 UC  mreadU4 (mp3File_t *file  , U4        *v   );
 UC  mreadU2 (mp3File_t *file  , U2        *v   );
 UC  mreadUC (mp3File_t *file  , UC        *v   );
 
-UC mwriteStr(mp3File_t *file, char *str, U4 len);
+UC mwriteStr(mp3File_t *file, UC *str, U4 len);
 UC mwriteU4 (mp3File_t *file, U4              v);
 UC mwriteU2 (mp3File_t *file, U2              v);
 UC mwriteUC (mp3File_t *file, UC              v);

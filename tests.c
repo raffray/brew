@@ -9,7 +9,7 @@
 #include "mp3Frame.h"
 #include "mp3File.h"
 #include "extern.h"
-#include "cpu_endian.h"
+//#include "cpu_endian.h"
 #include "mio.h"
 #include "err.h"
 #include "fileList.h"
@@ -19,6 +19,7 @@
 #include "text-encoding/iso-8859-1.h"
 #include "text-encoding/ascii.h"
 #include "bstream.h"
+#include "sync_buf.h"
 
 UC something(char *filename)
 {
@@ -27,7 +28,7 @@ UC something(char *filename)
   fprintf(ostream, "%s\n",filename);
   if(lstat(filename, &fstat)!=0) { fprintf(ostream, "___\n\n"); return FAILURE; } // <=== should check for errors ??
   // in case of a link, lstat will not look at what it points to... it's a link, bye
-	
+
   if(S_ISLNK(fstat.st_mode))   { fprintf(ostream, "is a link\n\n"); return SUCCESS; }   else fprintf(ostream, "is not a link\n");
   if(S_ISDIR(fstat.st_mode))     fprintf(ostream, "is a dir \n");   else fprintf(ostream, "is not a dir \n");
   if(S_ISREG(fstat.st_mode))     fprintf(ostream, "is a file\n");   else fprintf(ostream, "is not a file\n");
@@ -88,6 +89,26 @@ int tests(int argc, char **argv)
 {
   /*
   buffer_t buf;
+  U4 seq = 0xFF0000AA;
+  U4 i;
+  U4 size = 0x0100000;
+
+  buffer_init2(&buf, size);
+//  buffer_print(&buf);
+  for(i=0; i<size>>2; i++)
+    buffer_writeU4(&buf, seq);
+//  buffer_print(&buf);
+
+//  resyncBuf(buf.data, &size);
+  resyncBuf2(&buf);
+//  buffer_print(&buf);
+  free(buf.data);
+  exit(42);
+  */
+
+
+  /*
+  buffer_t buf;
   U4 len = 0;
 
   buffer_init2(&buf,24);
@@ -129,7 +150,7 @@ int tests(int argc, char **argv)
 
   free(data2);
   */
-  /*  
+  /*
   buffer_t buf;
   char *data;
 
@@ -137,10 +158,10 @@ int tests(int argc, char **argv)
   memset(data, 0, 3);
 //  buffer_open2(&buf, &data, 3);
   buffer_open(&buf, data, 3);
-//  printf("%d ", buf.size); buffer_print(&buf); 
+//  printf("%d ", buf.size); buffer_print(&buf);
   buffer_writeU4(&buf, 0x11223344);
   buffer_writeU4(&buf, 0x11223344);
-//  printf("%d ", buf.size); buffer_print(&buf); 
+//  printf("%d ", buf.size); buffer_print(&buf);
 
   free(buf.data);
   exit(42);
@@ -193,7 +214,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
   // create a string made up of 1 character (utf-8?)
   // and try to create a file with that name
 
-  // <========================  
+  // <========================
 
    */
 
@@ -228,7 +249,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 
     for(i=0;i<s2;i++)	memcpy((char*)(str2+(i*j)), str1, 10);
 //    option 1
-//    buffer_open(&bufin, str2, size);// printU4(size,NL);  printBuffer(&bufin);   
+//    buffer_open(&bufin, str2, size);// printU4(size,NL);  printBuffer(&bufin);
 //    resyncBuf(str2, &size);         // printU4(size,NL);  printBuffer(&bufin);   buffer_close(&bufin);
 //  option 2
     buffer_open(&bufin, str2, size);                         // printU4(size,NL); printBuffer(&bufin);
@@ -260,7 +281,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
     char name1_[S1+1] = {0x03, 0xEF, 0xBB, 0xA5, 0x00};                                          // includes string encoding as first byte
     //                       | ﻥ               |
 #define S2 12
-    char name2 [S2  ] = {      0xFE, 0xFF, 0xFE, 0xE5, 0x00, 0xE9, 0x00, 0xe8, 0xd8, 0x01, 0xdc, 0x00 }; // UTF16 string: ﻥéè𐐀 
+    char name2 [S2  ] = {      0xFE, 0xFF, 0xFE, 0xE5, 0x00, 0xE9, 0x00, 0xe8, 0xd8, 0x01, 0xdc, 0x00 }; // UTF16 string: ﻥéè𐐀
     char name2_[S2+1] = {0x01, 0xFE, 0xFF, 0xFE, 0xE5, 0x00, 0xE9, 0x00, 0xe8, 0xd8, 0x01, 0xdc, 0x00 };
     //                       | encoding  | ﻥ         | é         | è         | 𐐀                   |
     // as utf-8  :           0xEF,  0xBB, 0xA5, 0xC3, 0xA9, 0xC3, 0xA8, 0xF0, 0x90, 0x90, 0x80
@@ -269,9 +290,9 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
     //                       | encoding | ﻥ          | \0        | è         | 𐐀                   |
     char name4_[S2+1] = {0x00, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B };
 
-    char name5_[0x37+1] = {0x01,    0xFF, 0xFE, 0x00, 0x00, 0xFF, 0xFE, 0x47, 0x00,   0x65, 0x00, 0x72, 0x00, 0x6D, 0x00, 0x61, 0x00, 
-			            0x6E, 0x00, 0x79, 0x00, 0x2C, 0x00, 0x20, 0x00,   0x41, 0x00, 0x75, 0x00, 0x67, 0x00, 0x75, 0x00, 
-			            0x73, 0x00, 0x74, 0x00, 0x20, 0x00, 0x32, 0x00,   0x35, 0x00, 0x2C, 0x00, 0x20, 0x00, 0x31, 0x00, 
+    char name5_[0x37+1] = {0x01,    0xFF, 0xFE, 0x00, 0x00, 0xFF, 0xFE, 0x47, 0x00,   0x65, 0x00, 0x72, 0x00, 0x6D, 0x00, 0x61, 0x00,
+			            0x6E, 0x00, 0x79, 0x00, 0x2C, 0x00, 0x20, 0x00,   0x41, 0x00, 0x75, 0x00, 0x67, 0x00, 0x75, 0x00,
+			            0x73, 0x00, 0x74, 0x00, 0x20, 0x00, 0x32, 0x00,   0x35, 0x00, 0x2C, 0x00, 0x20, 0x00, 0x31, 0x00,
 			            0x39, 0x00, 0x38, 0x00, 0x34, 0x00, 0x00 };
     char iso[7] = { 0x00, 0x65, 0xB2, 0xFF, 0x0A, 0x0D, 0x33 };
 
@@ -288,7 +309,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 
     printf("[%s]\n", name1);
     printf("[%s]\n", name2);
-    
+
     print_string(name1_, S1+1, false, 0);
     print_string(name2_, S2+1, false, 0);
     print_string(name3_, S2+1, false, 0);
@@ -299,9 +320,9 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 
     print_string(test , 10   , false, 0);
     printf("ASCII\n");
-    print_string(ascii_str, 257, true, 0xFF); 
-    print_string(ascii_str2, 3, true, 0xFF); 
-    print_string(ascii_str, 257, true, 0x00); 
+    print_string(ascii_str, 257, true, 0xFF);
+    print_string(ascii_str2, 3, true, 0xFF);
+    print_string(ascii_str, 257, true, 0x00);
 
     printf("Tests... done!\n\n");
 //    exit(42);
@@ -374,12 +395,12 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
   //char str[LEN] = { 0b11011100, 0b10011110, 0 }; // 110a bcde 10fg hijk   with [x xxxx  xx xxxx] = [0000 0xxx xxxx xxxx] = 0x07 1E = [0000 0111 0001 1110]
   //                                    0x07 1E ->  110
   //                                                   1 11
-  //                                                       00 
+  //                                                       00
   //                                                          10
-  //                                                            01        
+  //                                                            01
   //                                                               1110
   //                                                1101 1100 1001 1110 --> 0xDC 9E
-  //                                                 
+  //
   #define LEN 4
   char str[LEN] = { 0b11011100, 0b10011110, 0x0032, 0 }; // first 2 bytes, = utf8 for --> ܞ <--   next is --> 2 <--, in ascii as well as utf8
 
@@ -396,7 +417,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
   cx2 = swprintf(buffer+cx1, 4, L"%lc", string[1]);
   fwprintf (stdout, L"%d [%ls]\n", cx1+cx2, buffer);
 
-  exit(42); 
+  exit(42);
   */
 
   /*
@@ -404,16 +425,16 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 //Generate all rename test files
 //
 //is_TPE1_is_TPE2__is_TALB__is_TRACK__is_TIT2
-//no      no       no       no        no        
+//no      no       no       no        no
 //
 // in the case is_TPE1__is_TPE2
 // we will double files into TPE1==TEP2 and TPE1!=TPE2 (egal and diff versions)
 
   char   id_block[10] = { 0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x09, 0x5D };
-  char tpe1_block[18] = { 0x54, 0x50, 0x45, 0x31, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x41, 0x52, 0x54, 0x49, 0x53, 0x54, 0x31 }; 
-  char tpe2_block[18] = { 0x54, 0x50, 0x45, 0x32, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x41, 0x52, 0x54, 0x49, 0x53, 0x54, 0x32 }; 
-  char talb_block[16] = { 0x54, 0x41, 0x4C, 0x42, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x41, 0x4C, 0x42, 0x55, 0x4D }; 
-  char trck_block[12] = { 0x54, 0x52, 0x43, 0x4B, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x31 }; 
+  char tpe1_block[18] = { 0x54, 0x50, 0x45, 0x31, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x41, 0x52, 0x54, 0x49, 0x53, 0x54, 0x31 };
+  char tpe2_block[18] = { 0x54, 0x50, 0x45, 0x32, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x41, 0x52, 0x54, 0x49, 0x53, 0x54, 0x32 };
+  char talb_block[16] = { 0x54, 0x41, 0x4C, 0x42, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x41, 0x4C, 0x42, 0x55, 0x4D };
+  char trck_block[12] = { 0x54, 0x52, 0x43, 0x4B, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x31 };
   char tit2_block[16] = { 0x54, 0x49, 0x54, 0x32, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x54, 0x49, 0x54, 0x4C, 0x45 };
 
   char    frame[6][5] = { "TPE1", "TPE2", "TALB", "TRCK", "TIT2" };
@@ -505,7 +526,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 	accDuration += hdr.length;   if(accDuration>251) break;               // 4'11
 	mseek(&mpfile, hdr.frameSize, SEEK_CUR); }
     startOffset_first = 0;
-    endOffset_first   = mtell(&mpfile); printU4(endOffset_first,NL); // <== gives an approximation 
+    endOffset_first   = mtell(&mpfile); printU4(endOffset_first,NL); // <== gives an approximation
     endOffset_first   = 0x543E62;                                  // <== through an hex-editor, locate start of silent frames
 
     while(1)
@@ -564,7 +585,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 	    ((i&0x0003) == 0x0000) )
 	  {
 	    val = 0xFF000000 + ((i<<8) & 0x00FFFF00);
-	    
+
 	    if(setMp3Header(&hdr, val) == SUCCESS)
 	      { printU4(val, SP);  printMp3Header_line(&hdr); }
 	  }
@@ -577,12 +598,12 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
 	    ((i&0x0003) == 0x0000) )
 	  {
 	    val = 0xFF000000 + ((i<<8) & 0x00FFFF00);
-	    
+
 	    if(setMp3Header(&hdr, val) == SUCCESS)
 	      { printU4(val, SP);  printMp3Header_line(&hdr); }
 	  }
       }
-   
+
     exit(2);
   }
   */
@@ -596,7 +617,7 @@ for(i=0; i<254; i++)    { printf("#%d\t",i+1);    print_section(&stream, 7, 0); 
     U4 i;
     U4 k;
 
-    resetFile(            "short-last-frame.mp3");   
+    resetFile(            "short-last-frame.mp3");
     setMp3File(&file   , "short-last-frame.mp3"  , 0, FSTREAM);    mseek(&file, 0, SEEK_SET);
     setMp3Header(&hdr, f1);   size1 = hdr.frameSize-4;   buf1 = malloc(size1);
     setMp3Header(&hdr, f2);   size2 = hdr.frameSize-4;   buf2 = malloc(size2);
@@ -646,8 +667,8 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
 		  if(setMp3Header(&hdr, val0) != SUCCESS) printf("ERROR  ");
 		  xing_offset = xingOffset[hdr.channelMode][hdr.versionId-1];
 
-		  printU4(val0, SP);  
-		  //		  printMp3Header_line(&hdr); 
+		  printU4(val0, SP);
+		  //		  printMp3Header_line(&hdr);
 		  fprintf(ostream, "Mpeg %d,%d -- %5d Hz -- %4d kbps -- ", hdr.versionId, hdr.layer, hdr.samplingRate, hdr.bitRate);
 		  switch( hdr.channelMode)
 		    {case 0 : fprintf(ostream,   "Stereo         -- "); break;
@@ -663,8 +684,8 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
 		  if(setMp3Header(&hdr, val) != SUCCESS) printf("ERROR  ");
 		  xing_offset = xingOffset[hdr.channelMode][hdr.versionId-1];
 
-		  printU4(val, SP);  
-		  //		  printMp3Header_line(&hdr); 
+		  printU4(val, SP);
+		  //		  printMp3Header_line(&hdr);
 		  fprintf(ostream, "Mpeg %d,%d -- %5d Hz -- %4d kbps -- ", hdr.versionId, hdr.layer, hdr.samplingRate, hdr.bitRate);
 		  switch( hdr.channelMode)
 		    {case 0 : fprintf(ostream,   "Stereo         -- "); break;
@@ -675,7 +696,7 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
 		  fprintf(ostream, "%4.3fms -- frameSize = %4d   size needed= %4d",   1000.0*hdr.length, hdr.frameSize, 120+xing_offset);
 		  if (hdr.frameSize>=120+xing_offset) printf("       OK\n\n");
 		  else                                printf("   NOT OK\n\n");  // <-- increase bitrate until it works
-		  
+
 		}
       }
 
@@ -686,8 +707,8 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
 
   /*
   { // creating files containing 1 frame
-    mp3File_t   frame_file; 
-    mp3File_t   outfile; 
+    mp3File_t   frame_file;
+    mp3File_t   outfile;
     mp3Header_t frame_hdr;
     U4          frame_hdrVal;
     char *name  = "frame_256kbps.mp3";
@@ -701,11 +722,11 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
     setMp3Header(&frame_hdr, frame_hdrVal);
 
     str = malloc(frame_hdr.frameSize);
-    mseek(&frame_file, SEEK_SET, 0);    
+    mseek(&frame_file, SEEK_SET, 0);
     mreadStr(&frame_file, str, frame_hdr.frameSize);
 
     resetFile(name2); setMp3File(&outfile, name2, 0, FSTREAM);
-    mseek   (&outfile, SEEK_SET, 0);    
+    mseek   (&outfile, SEEK_SET, 0);
     mwriteStr(&outfile, str, frame_hdr.frameSize);
     closeMp3File(&outfile);
 
@@ -723,11 +744,11 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
     mp3File_t file;
     char name[16]; // "vbr_xyzkbps.mp3"
     U4 i, j, k;
-    mp3File_t   frame_file1; 
+    mp3File_t   frame_file1;
     mp3Header_t frame_hdr1;
     U4          frame_hdrVal1;
     char *str1;
-    mp3File_t   frame_file2; 
+    mp3File_t   frame_file2;
     mp3Header_t frame_hdr2;
     U4          frame_hdrVal2;
     char *str2;
@@ -738,7 +759,7 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
     setMp3Header(&frame_hdr1  , frame_hdrVal1);
 
     str1 = malloc(frame_hdr1.frameSize);
-    mseek       (&frame_file1, SEEK_SET, 0);    
+    mseek       (&frame_file1, SEEK_SET, 0);
     mreadStr    (&frame_file1, str1, frame_hdr1.frameSize);
 
     closeMp3File(&frame_file1);
@@ -749,7 +770,7 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
     setMp3Header(&frame_hdr2  , frame_hdrVal2);
 
     str2 = malloc(frame_hdr2.frameSize);
-    mseek       (&frame_file2, SEEK_SET, 0);    
+    mseek       (&frame_file2, SEEK_SET, 0);
     mreadStr    (&frame_file2, str2, frame_hdr2.frameSize);
 
     closeMp3File(&frame_file2);
@@ -788,4 +809,4 @@ UC xingOffset[4][2] = { {32, 17},  // Stereo       - V1/ V2&3
   }
   */
   return SUCCESS;
-} 
+}

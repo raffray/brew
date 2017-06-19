@@ -76,9 +76,9 @@ void print_id3v2Tag(mp3File_t *file)
   for(i=0; i<get_id3v2Tag_frameCount(file); i++)
     { frameID = get_id3v2Tag_frame_frameID  (file, i);
       printU4str(frameID, SP);
-//      if      (get_id3v2Tag_frame_compression_flag(file, i))   { fprintf(ostream, "X -- compressed frame. Display not yet implemented\n"); }
-//      else if ( get_id3v2Tag_frame_encryption_flag(file, i))   { fprintf(ostream, "X -- encrypted  frame. Display not implemented\n"    ); }
-//      else
+  //      if      (get_id3v2Tag_frame_compression_flag(file, i))   { fprintf(ostream, "X -- compressed frame. Display not yet implemented\n"); }
+  //      else if ( get_id3v2Tag_frame_encryption_flag(file, i))   { fprintf(ostream, "X -- encrypted  frame. Display not implemented\n"    ); }
+  //      else
 	{ if (isSelectFrame(frameID) == true)   fprintf(ostream, ": ");
 	  else                                  fprintf(ostream, "* ");
 	   print_id3v2Tag_frame(file, i); } }
@@ -90,7 +90,7 @@ U4 dump_id3v2Tag(mp3File_t *file)
   U4 tagSize = 0;
   buffer_t frame_buf;
   U4 dataSize = get_firstFrame_offset(file);
-  char *data = malloc(dataSize);
+  UC *data = malloc(dataSize);
   UC version = 4; //  get_id3v2Tag_version(file)
 
   if (get_id3v2Tag_presenceFlag(file))
@@ -118,17 +118,17 @@ U4 dump_id3v2Tag(mp3File_t *file)
 
 void extractPictures(mp3File_t *file)
 { U4 i;
-//  UC picFound = false;
+  //  UC picFound = false;
 
   for(i=0;     i<get_id3v2Tag_frameCount(file); i++)
     if (is_APIC_tag(get_id3v2Tag_frame_frameID(file, i)))
       {
-//	if(picFound==false)
+  //	if(picFound==false)
 	//{ picFound = true;   fprintf(ostream, "Extracting pictures\n"); }
 	extract_APIC(file, i); }
 }
 
-VD addFrametoBuf(buffer_t *buf, U4 id, char *str, U4 len)
+VD addFrametoBuf(buffer_t *buf, U4 id, UC *str, U4 len)
 {
   buffer_writeU4(buf, id);
   if(id==COMM)
@@ -136,7 +136,7 @@ VD addFrametoBuf(buffer_t *buf, U4 id, char *str, U4 len)
       buffer_writeU4(buf, 1+4+len);
       buffer_writeU2(buf, 0); // flags
       buffer_writeUC(buf, 0); // encoding
-      buffer_writeU4(buf, 0x656E6700);
+      buffer_writeU4(buf, 0x656E6700); // "eng", for English
     }
   else
     {
@@ -151,13 +151,13 @@ VD addFrametoBuf(buffer_t *buf, U4 id, char *str, U4 len)
 VD addFrametoBuf_UC(buffer_t *buf, U4 id, UC val)
 {
   char str1[3];
-//  char str2[5];
+  //  char str2[5];
 
   sprintf(str1, "%d", val);
   /*  if(id == TCON)
     { sprintf(str2, "(%s)", str1);
       addFrametoBuf(buf, id, str2, strlen(str2));}
-      else*/ addFrametoBuf(buf, id, str1, strlen(str1));
+      else*/ addFrametoBuf(buf, id, (UC *)str1, strlen(str1));
 }
 
 buffer_t *makeV2fromV1Tag(mp3File_t *file)
@@ -167,7 +167,7 @@ buffer_t *makeV2fromV1Tag(mp3File_t *file)
   id3v1_xtdTag_t *xtd_v1;
 
   buf = malloc(sizeof(buffer_t));
-  buffer_init(buf);
+  buffer_init_default(buf);
   buffer_writeU4(buf, 0x49443304);
   buffer_writeU2(buf, 0x0000);
   buffer_writeU4(buf, 0);
@@ -189,10 +189,10 @@ buffer_t *makeV2fromV1Tag(mp3File_t *file)
       addFrametoBuf(buf, TPE1, v1->artist, 30);
       addFrametoBuf(buf, TALB, v1->album, 30);
       }
-//  char year   [ 5];  --> TYER
-//  char comment[31];  --> COMM
-//  UC track;          --> TRCK
-//  UC genre;          --> TCON
+  //  char year   [ 5];  --> TYER
+  //  char comment[31];  --> COMM
+  //  UC track;          --> TRCK
+  //  UC genre;          --> TCON
 
   addFrametoBuf(buf, TDRC, v1->year, 4);
   if(v1->flag==0)
@@ -205,7 +205,7 @@ buffer_t *makeV2fromV1Tag(mp3File_t *file)
   addFrametoBuf_UC(buf, TCON, v1->genre);
 
   buffer_seek(buf, 6, SEEK_SET);
-  buffer_writeU4(buf, encodeU4(get_buffer_size(buf)-10));
+  buffer_writeU4(buf, encodeU4(buf->usedSize-10));
 
   return buf;
 }

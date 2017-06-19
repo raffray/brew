@@ -3,6 +3,7 @@
 #include "iso-8859-1.h"
 #include "ascii.h"
 #include "err.h"
+#include "str.h"
 
 // http://en.wikipedia.org/wiki/UTF-8
 // http://www.utf8-chartable.de/unicode-utf8-table.pl
@@ -20,113 +21,186 @@ code point  code point  code point  sequence 	Byte 1 	        Byte 2 	        By
 26 	    U+200000 	U+3FFFFFF 	5 	111110xx 	10xxxxxx 	10xxxxxx 	10xxxxxx 	10xxxxxx
 31 	    U+4000000 	U+7FFFFFFF 	6 	1111110x 	10xxxxxx 	10xxxxxx 	10xxxxxx 	10xxxxxx 	10xxxxxx
 
-In November 2003, UTF-8 was restricted by RFC 3629 to end at U+10FFFF, in order to match the constraints of the UTF-16 character encoding. 
+In November 2003, UTF-8 was restricted by RFC 3629 to end at U+10FFFF, in order to match the constraints of the UTF-16 character encoding.
 This removed all 5- and 6-byte sequences, and about half of the 4-byte sequences.
 
 
-According to the UTF-8 definition (RFC 3629) the high and low surrogate halves used by UTF-16 (U+D800 through U+DFFF) are not legal Unicode values, 
+According to the UTF-8 definition (RFC 3629) the high and low surrogate halves used by UTF-16 (U+D800 through U+DFFF) are not legal Unicode values,
 and their UTF-8 encoding should be treated as an invalid byte sequence.
 
-Whether an actual application should do this is debatable, as it makes it impossible to store invalid UTF-16 (that is, UTF-16 with unpaired surrogate halves) 
-in a UTF-8 string. This is necessary to store unchecked UTF-16 such as Windows filenames as UTF-8. 
+Whether an actual application should do this is debatable, as it makes it impossible to store invalid UTF-16 (that is, UTF-16 with unpaired surrogate halves)
+in a UTF-8 string. This is necessary to store unchecked UTF-16 such as Windows filenames as UTF-8.
     */
 
 // We need to parse through the byte string; every n-byte sequence is converted to it's hexa code-point
 
-// If we meet an error... Translate the first byte into the replacement character ("�" (U+FFFD)) and continue parsing with the next byte. 
+// If we meet an error... Translate the first byte into the replacement character ("�" (U+FFFD)) and continue parsing with the next byte.
 
 
-UC print_string2_(char *data, U4 size, UC type_known, UC type_given)
+UC print_string_str(UC *data, U4 size, UC type_known, UC type_given)
 {
   buffer_t buf;
 
   buffer_open  (&buf, data, size);
-  return print_string2(&buf, type_known, type_given);
+  return print_string_buf(&buf, type_known, type_given);
 }
 
-UC print_string2(buffer_t *buffin, UC type_known, UC type_given)
+void eatZeroes(buffer_t *buf)
+{ UC c;
+  while(buffer_tell(buf)<buf->usedSize)
+  {
+    buffer_readUC(buf, &c);
+    if(c!=0)
+    {
+      buffer_seek(buf, -1, SEEK_CUR);
+      break;
+    }
+  }
+}
+
+void findNextZero(buffer_t *buf)
+{ UC c;
+  while(buffer_tell(buf)<buf->usedSize)
+  { buffer_readUC(buf, &c);
+    if(c==0)   break; }
+}
+
+
+UC print_string_buf(buffer_t *buffin, UC type_known, UC type_given)
 {
   buffer_t *buf;
+
 //  U4 dataSize = 0;
 //  char *data;
-  U4 len=0;
+//  U4 len=0;
+  UC firstString_flag =0;
 
-  if(!buffin->size)   return SUCCESS;
+  if(!buffin->usedSize)   return SUCCESS; // Empty string, nothing to print
 
 //  buffer_print(buffin);
-  buf = string_to_utf8(buffin, type_known, type_given);
-//  buffer_print(buf);
-  buffer_clean(buf);
+  buf = string_to_utf8_buf(buffin, type_known, type_given); // We are guaranteed we at least have one zero at the end
 //  buffer_print(buf);
 
-  buffer_seek(buf, 0, SEEK_SET);
-  while(len<buf->size)
+  // here, we need to "cleanup" the string-data in order to only have zero-separated strings and one and only zero at the end
+  //buffer_clean(buf); // we are moving and redesigning this function here
+  // Sample data string:
+  // 00 00 33 33 33 00 33 00 00 33 00 33 00 00 00
+  // Cleaned up string:
+  //       33 33 33 00
+  //                   33 00
+  //                            33 00
+  //                                  33 00
+  //
+  // 1: Discard all leading zeroes
+  // 2: for every non zero...
+  //  ...
+
+  // generate a list (linked?) of zero-termined strings (with no leading zeroes)
+  // OR a list of indexes to string starts.
+  //    1: count the number of sequences [non-zero followed by zero] ---> the number of sub-strings for array allocation
+  //    2: re-iterate and generate a start for each non-zero byte if it's
+  // first xx .. --> a string start
+  // from next non-zero byte, re-iterate
+/*  10101111 01000000
+| 11111111 00000000
+  11111111 01000000*/
+  // 1: count strings
+
+
+  /*
+  U4 string_count = 0;
+  U4 i;
+  U2 b;
+  for(i=0; i< buf->usedSize; i++)
+  {
+    b=readU2()
+    if( (b|0xFF00) == 0xFF00 )   string_count++;
+  }
+  U4 count;
+  UC c;
+  while (count<string_count)
+  {
+      // c = readU2(...)
+    // if ( ( (UC)((c&0x1100)>>8) !=0 ) && ( (UC)(c&0x0011) == 0 ) )
+    c = readUC(...)
+    if ( c !=0 )  ---> it's a start, add to start-list
+    else // eat all zeroes
+    {
+      c = readUC()
+      while (c==0) c = readUC()
+    }
+
+    count++;
+  }
+*/
+
+
+buffer_seek(buf,0,SEEK_SET);
+//printf("------\n       ");
+while(buffer_tell(buf)<buf->usedSize)
+  {
+    eatZeroes(buf);
+    if(firstString_flag==0)   firstString_flag++;
+    else                      printf("\n       ");
+
+    fprintf(ostream, "%s", buf->data+buffer_tell(buf));
+    findNextZero(buf); //buffer_seek(buf,strlen(buf->data+buffer_tell(buf)),SEEK_CUR);
+  }
+
+/*
+  while(len<buf->usedSize) // print multi-strings aka zero-separated strings in a given-length buffer
     { if (len==0) printf(         "%s", buf->data+len);
       else        printf("\n       %s", buf->data+len);
       len += strlen(buf->data+len)+1; }
-
-  free(buf->data);
-  free(buf);
-
-/*
-  data = buf->data;
-  dataSize = buf->size;
-  while(true)
-    { while((*data) == '\0') data++; //strip zeroes
-      if(data>=buf->data+dataSize)   return SUCCESS;
-      { if (data == buf->data)   fprintf(ostream,          "%s", data);
-	else                     fprintf(ostream, "\n       %s", data); }
-      data += strlen(data);
-    }
-
-  free(buf->data);
-  free(buf);
 */
+  free(buf->data);
+  free(buf);
+
   return SUCCESS;
 }
 
-UC print_string(char *str, U4 len, UC type_known, UC type_given)
+UC print_string(UC *str, U4 len, UC type_known, UC type_given)
 {
-  /*
+
   buffer_t *buf;
   U4 dataSize = 0;
-  char *data;
-  
+  UC *data;
+
   if(len==0)   return SUCCESS;
 
-  buf = string_to_utf8(str, len, type_known, type_given);
+  buf = string_to_utf8_str(str, len, type_known, type_given);
 //  buffer_print(buf);
   data = buf->data;
-  dataSize = buf->size;
+  dataSize = buf->usedSize;
   while(true)
     { while((*data) == '\0') data++; //strip zeroes
       if(data>=buf->data+dataSize)   return SUCCESS;
       { if (data == buf->data)   fprintf(ostream,          "%s", data);
 	else                     fprintf(ostream, "\n       %s", data); }
-      data += strlen(data);
+      data += strlen_(data);
     }
 
   free(buf->data);
   free(buf);
-  */
-  
+
+//printf("?want to use print_string_str?\n");
   return SUCCESS;
 }
 
-buffer_t *string_to_utf8_2(char *data, U4 size, UC type_known, UC type_given)
+buffer_t *string_to_utf8_str(UC *data, U4 size, UC type_known, UC type_given)
 {
   buffer_t buf;
 
   buffer_open(&buf, data, size);
 
-  return string_to_utf8(&buf, type_known, type_given);
+  return string_to_utf8_buf(&buf, type_known, type_given);
 }
 
-buffer_t *string_to_utf8(buffer_t *buffin, UC type_known, UC type_given)
+buffer_t *string_to_utf8_buf(buffer_t *buffin, UC type_known, UC type_given)
 { //                                           true/false     0,1,2 or 3
   // one utf-8  fits into either 1, 2, 3 or 4 bytes
   // one utf-16 fits into either    2    or 4 bytes
-  // one codepoint fits into 4 bytes (actually 3 since the max value is 0x10FFFF, but, we assign it a U4)
+  // one codepoint fits into 4 bytes (actually 3 since the max value is 0x10FFFF, but we assign it a U4)
 
 //  buffer_t buffin;
   buffer_t *buffout = malloc(sizeof(buffer_t));
@@ -135,20 +209,19 @@ buffer_t *string_to_utf8(buffer_t *buffin, UC type_known, UC type_given)
   UC enc;
 //  printf("====================== 1 =\n");
 //  buffer_open(buffin, str, len);
-  buffer_init(buffout          );
+  buffer_init_default(buffout          );
 
   if(type_known)   type = type_given;
   else             buffer_readUC(buffin, &type);
 
   switch(type)
     {
-    case 1: 
+    case 1:
     case 2:     if(get_UTF16_enc(buffin,            &enc) == SUCCESS) // <== do we need to test for SUCCESS?
-	while(     nextUTF16    (buffin, &codepoint, enc) == SUCCESS)  
+	while(     nextUTF16    (buffin, &codepoint, enc) == SUCCESS)
 	  { if (codepoint == 0) // multi-strings
 	      { if(get_UTF16_enc(buffin,            &enc) == SUCCESS) // BOM at start of each new string
-		  if(write_codepoint_to_utf8(buffout,   0) == FAILURE)   pExit("???");
-	      }
+		        if(write_codepoint_to_utf8(buffout,   0) == FAILURE)   pExit("???"); }
 	    else
 	      if(write_codepoint_to_utf8(buffout, codepoint) == FAILURE)   pExit("???");
 	  }   break;
@@ -238,7 +311,7 @@ UC write_codepoint_to_utf8   (buffer_t *buf, U4 cp)
   if(cp<0x800   )            return write_codepoint_to_utf8_2byte(buf,       cp);
   if(cp<0x10000 )            return write_codepoint_to_utf8_3byte(buf,       cp);
   if(cp<0x110000)            return write_codepoint_to_utf8_4byte(buf,       cp);
-  /**/                       return FAILURE;  /* Cannot happen with a codepoint we generated */  
+  /**/                       return FAILURE;  /* Cannot happen with a codepoint we generated */
 }
 /*
 UC count_UTF8Bytes(U4 cp) // <=== doesn't take into account the cases of malformed multi-bytes (overlongs...). It only overshoots the real size.
@@ -253,4 +326,3 @@ UC count_UTF8Bytes(U4 cp) // <=== doesn't take into account the cases of malform
 UC is_nonPrintable(U4 cp)
 { if(((cp>0) && (cp<0x05)) || (cp==0x06) || ((cp>0x0F) && (cp<0x20)) || ((cp>0x7E) && (cp<0xA0)))   return true;
   /**/                                                                                              return false; }
-

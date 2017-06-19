@@ -18,7 +18,7 @@
 //       Extract pictures (From APIC frames. Frames will be removed from tag)
 //
 // F --> Fix
-//       like "Cleanup" 
+//       like "Cleanup"
 //       + adjust padding size (256 bytes)
 //         fix or create the vbr frame
 //         if id3v2 tag not present but id3v1 tags are, create id3v2 tag from them
@@ -37,7 +37,7 @@
 #include "mp3Brew.h"
 #include "mp3File.h"
 #include "extern.h"
-#include "cpu_endian.h"
+//#include "cpu_endian.h"
 #include "mio.h"
 #include "err.h"
 #include "fileList.h"
@@ -51,11 +51,11 @@
 
 #include "fileList.h"
 
-UC    CPU_ENDIANNESS;
+//UC    CPU_ENDIANNESS;
 //UC          verbose1 = 0;
 //UC          verbose2 = 0;
 FILE        *ostream;       // either stdout or a logfile
-char *backupFilename = "mp3Brew.buf"; 
+char *backupFilename = "mp3Brew.buf";
 mp3File_t     buFile;  // not technically an mp3 file... just a file containing wrapped id3 tags
 UC            option;
 UC printWarnings_flag = false;
@@ -97,7 +97,7 @@ UC dispatch(int argc, char **argv)
 // prog -r file [-all] (TESTS ONLY) ... restore tag  of     file if it              has  an entry in "mp3Brew.buf". +256 bytes of padding
 // prog -r dir  [-all]              ... restore tags of all files found in dir that have an entry in "mp3Brew.buf". +256 bytes of padding
 // prog -e file [-s]                ... print the id3Tag and examines the mp3 data for frame corruptions
-// prog -e dir  [-s]                ... 
+// prog -e dir  [-s]                ...
 // prog -w file        (TESTS ONLY) ... wipe id3Tag + padding + data after last good frame
 // prog -w dir                      ... wipe id3Tag + padding + "  of all mp3s found in current dirrectory
 //                    [-v1]         ... extra debugging info (to make sure what retrieve is ok)
@@ -105,7 +105,7 @@ UC dispatch(int argc, char **argv)
 //
 // we process the number of args we expect, ignoring possible extra ones
 
-  getCpuEndianNess();
+//  getCpuEndianNess();
 
   if(argc<3)  return pExit("Error, expecting file/directory argument");
   option = isFlag(argv[1]);
@@ -126,7 +126,7 @@ UC dispatch(int argc, char **argv)
     case X  :                                                                                                        break;
     case T  :                                                                                                        break;
     case C  :                                                                                                        break;
-    default : option = 0; 
+    default : option = 0;
     }
 
   /*
@@ -152,7 +152,7 @@ UC dispatch(int argc, char **argv)
     // sampleRates are equal
     //(might want to drop the channel mode?)
     // So, in short, if there is a change of header specs... WE CAN'T CREATE A VBR HEADER
-    // ( technically, we could have a change in specs and still have a constant length. 
+    // ( technically, we could have a change in specs and still have a constant length.
     // But this still should be considered a corruption!!
     // NO FIXING WILL BE DONE IF WE HAVE SPEC CHANGES (AND MAYBE BROKEN CHAINS TOO???)
     *
@@ -163,7 +163,7 @@ UC dispatch(int argc, char **argv)
 
   return SUCCESS;
 }
- 
+
 void postDispatch()
 { if (ostream != stdout)   fclose(ostream);
   clean_file_list(&good_fList);                   }
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
   postDispatch();
 
   return SUCCESS;
-} 
+}
 
 
 UC test_file(fileLink_t *link)
@@ -213,4 +213,3 @@ UC test_file(fileLink_t *link)
 
   return SUCCESS;
 }
-
