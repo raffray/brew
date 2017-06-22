@@ -40,7 +40,7 @@ byte.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) *.o */*.o core.* *~ */*~ $(TARGET)
+	$(RM) *.o */*.o core.* *~ */*~ $(TARGET) logfile
 
 
 all:  $(TARGET)
