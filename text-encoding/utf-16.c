@@ -5,11 +5,11 @@
 // http://en.wikipedia.org/wiki/UTF-16
 // http://www.utf8-chartable.de/unicode-utf8-table.pl
 
-    /* UTF16
+    /* UTF16 - specs
 
 *** U+0000 to U+D7FF and U+E000 to U+FFFF
 
-The first plane (code points U+0000 to U+FFFF) contains the most frequently used characters and is called the Basic Multilingual Plane or BMP. 
+The first plane (code points U+0000 to U+FFFF) contains the most frequently used characters and is called the Basic Multilingual Plane or BMP.
 Code points in this range are numerically equal to the corresponding code points.
 Within this plane, code points U+D800 to U+DFFF (see below) are reserved for lead and trail surrogates.
 
@@ -25,30 +25,30 @@ D801 	        010400 	010401 	… 	0107FF
 DBFF 	        10FC00 	10FC01 	… 	10FFFF
 
     0x010000 is subtracted from the code point, leaving a 20 bit number in the range 0..0x0FFFFF.
-    ** The top ten bits (a number in the range 0..0x03FF) are added to 0xD800 to give the first code unit or lead/high surrogate, 
+    ** The top ten bits (a number in the range 0..0x03FF) are added to 0xD800 to give the first code unit or lead/high surrogate,
        which will be in the range 0xD800..0xDBFF.
-    ** The low ten bits (         in the range 0..0x03FF) are added to 0xDC00 to give the second code unit or trail/low surrogate, 
+    ** The low ten bits (         in the range 0..0x03FF) are added to 0xDC00 to give the second code unit or trail/low surrogate,
        which will be in the range 0xDC00..0xDFFF.
 
-Since the ranges for the lead surrogates, trail surrogates, and valid BMP characters are disjoint, searches are simplified: 
-it is not possible for part of one character to match a different part of another character. It also means that UTF-16 is 
-self-synchronizing on 16-bit words: whether a code unit starts a character can be determined without examining earlier code units. 
-UTF-8 shares these advantages, but many earlier multi-byte encoding schemes did not allow unambiguous searching and could only be 
+Since the ranges for the lead surrogates, trail surrogates, and valid BMP characters are disjoint, searches are simplified:
+it is not possible for part of one character to match a different part of another character. It also means that UTF-16 is
+self-synchronizing on 16-bit words: whether a code unit starts a character can be determined without examining earlier code units.
+UTF-8 shares these advantages, but many earlier multi-byte encoding schemes did not allow unambiguous searching and could only be
 synchronized by re-parsing from the start of the string. UTF-16 is not self-synchronizing if one byte is lost or if traversal starts at a random byte.
 
-Because the most commonly used characters are all in the Basic Multilingual Plane, handling of surrogate pairs is often not thoroughly tested. 
+Because the most commonly used characters are all in the Basic Multilingual Plane, handling of surrogate pairs is often not thoroughly tested.
 This leads to persistent bugs and potential security holes, even in popular and well-reviewed application software (e.g. CVE-2008-2938, CVE-2012-2135).[3]
 
 
 **** U+D800 to U+DFFF
 
-The Unicode standard permanently reserves these code point values for UTF-16 encoding of the lead and trail surrogates, and they will never be 
-assigned a character, so there should be no reason to encode them. The official Unicode standard says that no UTF forms, including UTF-16, can 
+The Unicode standard permanently reserves these code point values for UTF-16 encoding of the lead and trail surrogates, and they will never be
+assigned a character, so there should be no reason to encode them. The official Unicode standard says that no UTF forms, including UTF-16, can
 encode these code points.
 
-However UCS-2, UTF-8, and UTF-32 can encode these code points in trivial and obvious ways, and large amounts of software does so even though 
-the standard states that such arrangements should be treated as encoding errors. It is possible to unambiguously encode them in UTF-16 by using 
-a code unit equal to the code point, as long as no sequence of two code units can be interpreted as a legal surrogate pair (that is, as long as 
+However UCS-2, UTF-8, and UTF-32 can encode these code points in trivial and obvious ways, and large amounts of software does so even though
+the standard states that such arrangements should be treated as encoding errors. It is possible to unambiguously encode them in UTF-16 by using
+a code unit equal to the code point, as long as no sequence of two code units can be interpreted as a legal surrogate pair (that is, as long as
 a lead surrogate is never followed by a trail surrogate). The majority of UTF-16 encoder and decoder implementations translate between encodings
 as though this were the case.
     */
@@ -80,7 +80,7 @@ UC nextUTF16(buffer_t *buf, U4 *w, UC enc) // gets the codepoint value correspon
     /**/                              { *w = ERR_CHAR;   return SUCCESS; }
   if ((val<0xD800) || (val>0xDFFF))   { *w = val;        return SUCCESS; }
 
-  // ***   lead in:  U+D800 -- U+DBFF    
+  // ***   lead in:  U+D800 -- U+DBFF
   if ((val<0xD800) || (val>0xDBFF))   { *w = ERR_CHAR;   return SUCCESS; } // lead surrogate expected but not found
 
   if (buffer_readU2(buf, &low) == FAILURE)               return FAILURE;   // lead surrogate found, but no data available after; char discarded
@@ -124,7 +124,7 @@ w2 = 0xDC00 + vl
  */
 
 /*
-   
+
    0001 0000 1111 1111  1111 1111
 -  0000 0001 0000 0000  0000 0000
 =  0000 1111 1111 1111  1111 1111
@@ -140,7 +140,7 @@ w2 = 0xDC00 + vl
 
 /*
 vh = w1 - 0xD800
-vl = w2 - 0xDC00 
+vl = w2 - 0xDC00
 
 vl = 0xDF00 - 0xDC00
    =   1101 1111  0000 0000
@@ -158,7 +158,7 @@ vl + (vh << 10)
 =  0000  0000 0011  0000 0000
 +  0001  0000 0000  0000 0000
 =  0001  0000 0011  0000 0000
-   1     0    3     0    0 
+   1     0    3     0    0
 
 
 

@@ -123,7 +123,7 @@ U4 get_id3v2Tag_frameSize(U4 val, UC ver)
 }
 
 U4 set_id3v2Tag_frameSize(U4 val, UC ver)
-{ if(ver == 3) return set_id3v2Tag_frameSize_v4(val);
+{ if(ver == 3) return set_id3v2Tag_frameSize_v3(val);
   if(ver == 4) return set_id3v2Tag_frameSize_v4(val);
   return FAILURE; //unreached code
 }

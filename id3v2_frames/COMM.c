@@ -42,7 +42,7 @@ FF FE 47 00 65 00 72 00 6D 00 61 00 6E 00 79 00 2C 00 20 00 41 00 75 00 67 00 75
 
 1 byte  --> encoding
 3 bytes --> language... meaning: we need to make sure those are 3 ascii printable characters.
-N bytes --> 2 strings, this data will be recoded into utf8
+N bytes --> 2 strings, this data will be re-encoded into utf8
 		    <==== Do NOT forget to handle the BOM for the second string if utf16 encoded.
 
 */
@@ -56,27 +56,12 @@ typedef struct COMM_frame
 
 UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
 { UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
-  U4                 dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
- // buffer_t           data_buffer;
-// buffer_t           *data_buffer = get_id3v2Tag_frame_buffer(file, frameNb);
-
-//  UC            enc; // text encoding
-//  char  *utf8_string;
+  U4               dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
   buffer_t *utf8_buf;
-//  buffer_t buffin;
   UC res;
 
   if(dataSize<4)   return false; // <== ??
 
-//   buffer_open   (&data_buffer, data, dataSize);
-//   buffer_readUC (&data_buffer, &enc);
-
-      // the short description
-//  utf8_buf        = string_to_utf8_str(data+4, dataSize -4, true, enc);
-/*
-  buffer_open   (&buffin, data+4, dataSize-4);
-  utf8_buf        = string_to_utf8_buf(&buffin, true, *data);
-  */
   utf8_buf        = string_to_utf8_str(data+4, dataSize-4, true, *data);
   res = (utf8_buf->data == 0); //strlen(utf8_buf->data);
 
@@ -87,8 +72,25 @@ UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
 }
 
 void print_COMM(mp3File_t *file, U4 frameNb)
-{ //char              *data     = get_id3v2Tag_frame_data    (file, frameNb);
-  U4                 dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
+{ UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
+  U4               dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
+
+  buffer_t buf;
+  UC enc;
+  UC langBytes[3];
+
+
+  if(dataSize<4) {}
+  else
+  {
+    buffer_readUC(buf, &enc);
+    buffer_readStr(buf, &langBytes, 3);
+  }
+}
+
+void print_COMM_old(mp3File_t *file, U4 frameNb)
+{ UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
+  U4               dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
   /*
   buffer_t           data_buffer;
@@ -129,21 +131,18 @@ void print_COMM(mp3File_t *file, U4 frameNb)
 
       // 01 65 6E 67 FF FE 00 00 FF FE 47 00 65 00 72 00 6D 00 61 00 6E 00
       //    e  n  g
-      // buf --> 01 65 6E 67 00 47 65 72 6F 61 6E 00
+      // buf ---> 01 65 6E 67 00 47 65 72 6F 61 6E 00
       //
       // from 4th byte; we need to count 2 00
       // if frame is properly formed, we should count EXACTLY 2 zeros
 
 //      for(i=4; i<buf->size; i++)   { buffer_readUC(buf, &c);   if(c==0) break;}
 
-
       // the rest of the buffer should contain 2 strings
       // 1) string_to_utf8(...
       // 2) find first nonZero character
 
-
 // ///// first 4 bytes of buf are the encoding and 3 bytes for language; example
-
 
       //if first 0 encountered is the last of the string/buffer, there's only the short desc
 

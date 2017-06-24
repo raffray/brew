@@ -22,20 +22,20 @@ may create link during dir processing ( having checked it's an mp3 )
 and addlink link to list
 */
 
-char progressStr[9][6] = { ".    ", 
-			   "..   ", 
-			   "...  ", 
-			   ".... ", 
-			   ".....", 
-			   " ....", 
-			   "  ...", 
-			   "   ..", 
+char progressStr[9][6] = { ".    ",
+			   "..   ",
+			   "...  ",
+			   ".... ",
+			   ".....",
+			   " ....",
+			   "  ...",
+			   "   ..",
 			   "    ." };
 			   /*
-			   "  ...", 
-			   "  ...", 
-			   "  ...", 
-			   "  ...", 
+			   "  ...",
+			   "  ...",
+			   "  ...",
+			   "  ...",
 			   */
 
 fileLink_t *create_file_link(char *filename, U4 offset)
@@ -62,7 +62,7 @@ void push_file_link(fileList_t *list, char *filename, U4 offset)
   else
     {
       (list->last)->next = newLink;
-       list->last        = newLink;      
+       list->last        = newLink;
     }
 }
 
@@ -146,8 +146,8 @@ UC addFilenameToList(fileList_t *list, char *filename, UC print)
   // in case a file is not an mp3 file, BSTREAM is faster, but we don't expect to encounter .mp? files to not contain an mpeg stream
 
   TRY(open_mpFile(&mpFile, filename,  FSTREAM) ,   Fprintf2("Could not open file \"%s\"\n", filename);)
-  if(   isMp3File(&mpFile) == true)   
-    push_file_link(list, filename, get_stream_start_offset(&mpFile)); 
+  if(   isMp3File(&mpFile) == true)
+    push_file_link(list, filename, get_stream_start_offset(&mpFile));
   closeMp3File   (&mpFile);
 
   return SUCCESS;
@@ -167,18 +167,19 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
     AND/OR also in push_file
    */
 
-  if (isRegFile(name))   
+  if (isRegFile(name))
     // addFilenameToList(&good_fList, name, false); // <== when called directly (not through generateFileList), we need to lsstat the file for access rights...
     // in generateFileList, the entry_string has already been lstat"ed". Do we do it always a second time.
     // or maybe (BETTER) just if isRegfile.
-    
+
     {
       struct stat entry_stat;
-      
+
       if(lstat(name, &entry_stat) == 0) // else, we may want to check the value of errno
-	if( ((strlen(name)-4)>0) && ( (   strcmp(name+strlen(name)-4, ".mp1")==0) || (strcmp(name+strlen(name)-4, ".mp2")==0) || (strcmp(name+strlen(name)-4, ".mp3")==0) 
-				      || (strcmp(name+strlen(name)-4, ".MP2")==0) || (strcmp(name+strlen(name)-4, ".MP2")==0) || (strcmp(name+strlen(name)-4, ".MP3")==0) ) )
-	  addFilenameToList(&good_fList, name, true);
+			  if( ((strlen(name)-4)>0) &&
+					( (   strcmp(name+strlen(name)-4, ".mp1")==0) || (strcmp(name+strlen(name)-4, ".mp2")==0) || (strcmp(name+strlen(name)-4, ".mp3")==0)
+				    || (strcmp(name+strlen(name)-4, ".MP2")==0) || (strcmp(name+strlen(name)-4, ".MP2")==0) || (strcmp(name+strlen(name)-4, ".MP3")==0) ) )
+	  			addFilenameToList(&good_fList, name, true);
     }
   else if(isDir(name))    { /*printf("-- 1 --\n");*/   generateFileLists(name);  printf("\n%d files to process\n", good_fList.fileCount); }
   else return FAILURE;
@@ -210,8 +211,8 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
 
       for(i=0; i<fileCount; i++)
 	{ if( printWarnings_flag == false ) //!( (option==E) && (printMode==SCAN)) )
-	    Fprintf2("====> --- Filename: %s\n", good_fList.ptrList[i]->filename);   
-	  printf("\rprogress: %"PRId32"/%"PRId32"", ++fileNb, good_fList.fileCount);   fflush(stdout); 
+	    Fprintf2("====> --- Filename: %s\n", good_fList.ptrList[i]->filename);
+	  printf("\rprogress: %"PRId32"/%"PRId32"", ++fileNb, good_fList.fileCount);   fflush(stdout);
 
 
 
@@ -223,8 +224,8 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
 	  // pass mpFile as arg to func(...)
 	  // or just insert   setMp3_offsets()   in all the functions <===============================
 
-//	  TRY(func(good_fList.ptrList[i]), {}) 
-	  TRY(func(get_fileLink(&good_fList, i)) , {}) 
+//	  TRY(func(good_fList.ptrList[i]), {})
+	  TRY(func(get_fileLink(&good_fList, i)) , {})
 	  //
 	  // <===
 
@@ -244,7 +245,7 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
 }
 
 void generateFileLists(char *path)
-{ 
+{
   // This function will only be called once.
   // it will be used to create a list of files to be processed. (and maybe one of files not to process -- or we simply print the filenames?)
   // Files will be added IF they have "mp?" extension (AND mp3Data is found)
@@ -252,9 +253,9 @@ void generateFileLists(char *path)
   // then functions will be passed the list and process every file on the list.
 
 
-// we recursively find every .mp? file 
+// we recursively find every .mp? file
   DIR        *currentDir;
-  struct dirent   *entry;  // Possibly not POSIX | entry->d_name is the only field you can count on in all POSIX systems. 
+  struct dirent   *entry;  // Possibly not POSIX | entry->d_name is the only field you can count on in all POSIX systems.
   char     *entry_string;
   struct stat entry_stat;
   int lstat_res;
@@ -264,29 +265,29 @@ void generateFileLists(char *path)
       {
 	entry_string = malloc(strlen  (path) + 1 + strlen(entry->d_name) + 1);
 	sprintf(entry_string, "%s/%s", path,              entry->d_name);
-	lstat_res = lstat(entry_string, &entry_stat); 
-	// <=== should check for errors such as 
+	lstat_res = lstat(entry_string, &entry_stat);
+	// <=== should check for errors such as
 	// [ELOOP] : A loop exists in symbolic links encountered during resolution of the path argument.
 	// [ENAMETOOLONG] : The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.
-	
+
 	if(lstat_res==0) // else, we may want to check the value of errno
 	  if( !S_ISLNK(entry_stat.st_mode) ) // WE DO NOT WANT TO FOLLOW LINKS
 	    {
 	      if (S_ISDIR(entry_stat.st_mode)) // it's a directory
 		{ if( (strcmp(entry->d_name, ".")!=0) && (strcmp(entry->d_name, "..")!=0) )
-		    { if( (entry_stat.st_mode & S_IXUSR) && (entry_stat.st_mode & S_IRUSR) )  // READ and EXECUTE rights??? 
+		    { if( (entry_stat.st_mode & S_IXUSR) && (entry_stat.st_mode & S_IRUSR) )  // READ and EXECUTE rights???
 			generateFileLists(entry_string); } }
 	      else if (S_ISREG(entry_stat.st_mode))// it's a file
 		{
 		  //printf("\r%s %d files checked", progressStr[rank%10], rank); fflush(stdout);
 		  printf("\r%5d files checked", rank); fflush(stdout);
 		  rank++;
-		  // default, we only process likely-to-be-ok files 
-		  if( ((strlen(entry_string)-4)>0) && ( (   strcmp(entry_string+strlen(entry_string)-4, ".mp1")==0) 
-							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp2")==0) 
-							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp3")==0) 
-							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0) 
-							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0) 
+		  // default, we only process likely-to-be-ok files
+		  if( ((strlen(entry_string)-4)>0) && ( (   strcmp(entry_string+strlen(entry_string)-4, ".mp1")==0)
+							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp2")==0)
+							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp3")==0)
+							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0)
+							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0)
 							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP3")==0) ) )
 		    {
 		      addFilenameToList(&good_fList, entry_string, true); // actually adding if isMp3
