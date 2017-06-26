@@ -83,8 +83,8 @@ void print_COMM(mp3File_t *file, U4 frameNb)
   if(dataSize<4) {}
   else
   {
-    buffer_readUC(buf, &enc);
-    buffer_readStr(buf, &langBytes, 3);
+    buffer_readUC(&buf, &enc);
+    buffer_readStr(&buf, &langBytes, 3);
   }
 }
 

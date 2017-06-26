@@ -130,7 +130,7 @@ void print_TCON(mp3File_t *file, U4 frameNb) // mseek already performed by print
   */
 
   // string will be a sequence of
-  print_string(data, dataSize, false, 0); //printf("%s\n", buffer->data);
+  print_string_str(data, dataSize, false, 0); //printf("%s\n", buffer->data);
 
   //free(buffer);
 
