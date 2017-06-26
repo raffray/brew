@@ -37,8 +37,7 @@ in a UTF-8 string. This is necessary to store unchecked UTF-16 such as Windows f
 
 
 UC print_string_str(UC *data, U4 size, UC type_known, UC type_given)
-{
-  buffer_t buf;
+{ buffer_t buf;
 
   buffer_open  (&buf, data, size);
   return print_string_buf(&buf, type_known, type_given);
@@ -159,7 +158,7 @@ while(buffer_tell(buf)<buf->usedSize)
   return SUCCESS;
 }
 
-UC print_string(UC *str, U4 len, UC type_known, UC type_given)
+UC print_string_obsolete(UC *str, U4 len, UC type_known, UC type_given)
 {
 
   buffer_t *buf;
