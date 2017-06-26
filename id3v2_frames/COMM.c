@@ -43,16 +43,10 @@ FF FE 47 00 65 00 72 00 6D 00 61 00 6E 00 79 00 2C 00 20 00 41 00 75 00 67 00 75
 1 byte  --> encoding
 3 bytes --> language... meaning: we need to make sure those are 3 ascii printable characters.
 N bytes --> 2 strings, this data will be re-encoded into utf8
-		    <==== Do NOT forget to handle the BOM for the second string if utf16 encoded.
+		    <==== Do NOT forget to handle the BOM for the second string if utf16-encoded.
 
 */
 
-/*
-typedef struct COMM_frame
-{
-
-} COMM_frame_t;
-*/
 
 UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
 { UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
@@ -71,20 +65,54 @@ UC has_empty_shortDesc_COMM(mp3File_t *file, U4 frameNb)
   return (res == 0);
 }
 
+U4 nth_utf8_string_start(buffer_t *str_buf, U4 nth)
+{
+  UC c;
+
+  buffer_seek(str_buf, 0, SEEK_SET);
+  while(nth>0)
+  {
+    buffer_readUC(str_buf, &c);
+    if(c==0) nth--;
+  }
+  return str_buf->cursor;
+}
+
 void print_COMM(mp3File_t *file, U4 frameNb)
 { UC              *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4               dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
   buffer_t buf;
   UC enc;
-  UC langBytes[3];
+  UC langBytes[4];
+  UC *short_desc;
+  UC *comm;
+  buffer_t *str_buf;
 
+
+buffer_open (&buf, data, dataSize);
+//buffer_print(&buf);
 
   if(dataSize<4) {}
   else
   {
-    buffer_readUC(buf, &enc);
-    buffer_readStr(buf, &langBytes, 3);
+    buffer_readUC (&buf, &enc);
+    buffer_readStr(&buf, &langBytes, 3);
+    langBytes[3]=0;
+
+    str_buf = string_to_utf8_str(data+4, dataSize-4, true, enc);
+//    buffer_print(str_buf);
+/*
+    print_nth_utf8_string(str_buf,0);
+    print_nth_utf8_string(str_buf,1);
+    print_nth_utf8_string(str_buf,2);
+    print_nth_utf8_string(str_buf,3);
+    print_nth_utf8_string(str_buf,4);
+*/
+  short_desc = str_buf->data + nth_utf8_string_start(str_buf, 0);
+  comm = str_buf->data + nth_utf8_string_start(str_buf, 1);
+
+  fprintf(ostream, "(%s)[%s]: %s", short_desc, langBytes, comm);
   }
 }
 

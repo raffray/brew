@@ -5,12 +5,12 @@
 #include "err.h"
 #include "str.h"
 
+/* UTF8 - specs
+
 // http://en.wikipedia.org/wiki/UTF-8
 // http://www.utf8-chartable.de/unicode-utf8-table.pl
 // http://www.unicode.org/faq/private_use.html#noncharacters
 // http://stackoverflow.com/questions/1319022/really-good-bad-utf-8-example-test-data
-
-/* UTF8 - specs
 
 Bits of     First       Last        Bytes in
 code point  code point  code point  sequence 	Byte 1 	        Byte 2 	        Byte 3 	        Byte 4 	        Byte 5 	        Byte 6
@@ -32,7 +32,7 @@ in a UTF-8 string. This is necessary to store unchecked UTF-16 such as Windows f
 */
 
 // We need to parse through the byte string; every n-byte sequence is converted to it's hexa code-point
-
+//
 // If we meet an error... Translate the first byte into the replacement character ("�" (U+FFFD)) and continue parsing with the next byte.
 
 
