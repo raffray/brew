@@ -16,9 +16,9 @@ char picType[21][22] = { "Other", "32x32 png", "Other file icon", "cover", "back
 /*
 <Header for 'Attached picture', ID: "APIC">
 Text encoding   $xx
-MIME type       <text string> $00                                    <-- this should be an ascii string? iso? encoding is not related here.
+MIME type       <text string> $00                              <-- this should be an ascii string? iso? encoding is not related here.
 Picture type    $xx
-Description     <text string according to encoding> $00 (00)         <-- the encoding byte refers to this string
+Description     <text string according to encoding> $00 (00)   <-- the encoding byte refers to this string
 Picture data    <binary data>
 */
 
@@ -48,17 +48,22 @@ UC APIC_valid(UC *data, U4 dataSize, apic_data_ *apic)
 }
 
 void print_APIC(mp3File_t *file, U4 frameNb)
-{ /*char *data     = get_id3v2Tag_frame_data    (file, frameNb);
+{ UC   *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
-  buffer_t *buf  = get_id3v2Tag_frame_buffer(file, frameNb);
+//  buffer_t *buf  = get_id3v2Tag_frame_buffer(file, frameNb);
   apic_data_ apic;
+  U4 i;
 
   if(APIC_valid(data, dataSize, &apic))
-    { fprintf(ostream, "(");                                            print_string_str(apic.desc_string_start, apic.desc_string_len, true, apic.enc );
-      fprintf(ostream, "), [%s, %d]: ", picType[apic.pic_type], apic.pic_type);   print_string_str(apic.mime_string_start, apic.mime_string_len, true, 0xFF);
+    { fprintf(ostream, "(");
+			print_string_str(apic.desc_string_start, apic.desc_string_len-1, true, apic.enc );
+			////for(i=0; i<length; i++)   { fprintf(ostream, "%c", data[i]); }
+      fprintf(ostream, "), [%s, %d]: ", picType[apic.pic_type], apic.pic_type);
+			print_string_str(apic.mime_string_start, apic.mime_string_len-1, true, 0xFF);
+			////for(i=0; i<length; i++)   { fprintf(ostream, "%c", data[i]); }
       fprintf(ostream, " , %d bytes", apic.pic_dataSize); }
-			*/
-			fprintf(ostream, "working on it");
+
+	//		fprintf(ostream, "working on it");
 }
 
 

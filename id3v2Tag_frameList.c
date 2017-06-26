@@ -90,10 +90,10 @@ void retrieve_id3v2Tag_frameList(mp3File_t *file)
 
   if ((tagVersion == 3) && get_id3v2Tag_unsync_presenceFlag(file))
     {
-//      printf("----- YES\n");      exit(42);
-    resyncBuf2(&tagBuffer);
-}
-//      printf("----- NO\n");      exit(42);
+     //      printf("----- YES\n");      exit(42);
+      resyncBuf2(&tagBuffer);
+    }
+    //      printf("----- NO\n");      exit(42);
 
   while ((frameSize = retrieve_id3v2Tag_frame(file, &tagBuffer)) != 0)
     tagSize += HEADER_SIZE  + frameSize;

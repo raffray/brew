@@ -58,7 +58,7 @@ return buf2 (need string and new_size)
        or just string and size.
 
 keep original data?
- * case 1: id3v2.3 --> original data is all the data between end of header and start of mp3-data (end of last frame would be preferable but can't be determined at this point)
+ * case 1: id3v2.3 --> original data is all the data between end_of_header and start_of_mp3-data (end of last frame would be preferable but can't be determined at this point)
 
  */
 
@@ -75,14 +75,14 @@ void print_id3v2Tag(mp3File_t *file)
   fprintf(ostream, "Id3v2.%d.%d Tag\n", get_id3v2Tag_version(file), get_id3v2Tag_revision(file));
   for(i=0; i<get_id3v2Tag_frameCount(file); i++)
     { frameID = get_id3v2Tag_frame_frameID  (file, i);
-      printU4str(frameID, SP);
-  //      if      (get_id3v2Tag_frame_compression_flag(file, i))   { fprintf(ostream, "X -- compressed frame. Display not yet implemented\n"); }
-  //      else if ( get_id3v2Tag_frame_encryption_flag(file, i))   { fprintf(ostream, "X -- encrypted  frame. Display not implemented\n"    ); }
+      printU4str(frameID, SP); // <==
+  //      if      (get_id3v2Tag_frame_compression_flag(file, i))   { fprintf(ostream, "\bX -- compressed frame. Display not yet implemented\n"); }
+  //      else if ( get_id3v2Tag_frame_encryption_flag(file, i))   { fprintf(ostream, "\bX -- encrypted  frame. Display not implemented\n"    ); }
   //      else
-	{ if (isSelectFrame(frameID) == true)   fprintf(ostream, ": ");
-	  else                                  fprintf(ostream, "* ");
-	   print_id3v2Tag_frame(file, i); } }
-}
+	{ if (isSelectFrame(frameID) == true)   fprintf(ostream, "\b: ");
+	  else                                  fprintf(ostream, "\b* ");
+	  print_id3v2Tag_frame(file, i); } }
+  }
 
 U4 dump_id3v2Tag(mp3File_t *file)
 { U4 frameCount = get_id3v2Tag_frameCount(file);
