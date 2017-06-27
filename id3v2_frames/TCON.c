@@ -7,6 +7,7 @@
 #include "byte.h"
 #include "err.h"
 #include "text-encoding/utf-8.h"
+#include "text-encoding/utf-8_prints.h"
 #include "str.h"
 
 /* TCON : Content Type
@@ -105,7 +106,7 @@ void print_TCON2(mp3File_t *file, U4 frameNb) // mseek already performed by prin
 //  char     *data = get_id3v2Tag_frame_data    (file, frameNb);
 //  U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 
-  print_string_buf(buffer, false, 0);
+  print_multiString_buf(buffer, false, 0);
 }
 
 void print_TCON(mp3File_t *file, U4 frameNb) // mseek already performed by print_Txxx_frame
@@ -130,7 +131,7 @@ void print_TCON(mp3File_t *file, U4 frameNb) // mseek already performed by print
   */
 
   // string will be a sequence of
-  print_string_str(data, dataSize, false, 0); //printf("%s\n", buffer->data);
+  print_multiString_str(data, dataSize, false, 0); //printf("%s\n", buffer->data);
 
   //free(buffer);
 

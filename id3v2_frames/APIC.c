@@ -6,6 +6,7 @@
 #include "extern.h"
 #include "byte.h"
 #include "text-encoding/utf-8.h"
+#include "text-encoding/utf-8_prints.h"
 #include "err.h"
 #include "str.h"
 
@@ -52,14 +53,14 @@ void print_APIC(mp3File_t *file, U4 frameNb)
   U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
 //  buffer_t *buf  = get_id3v2Tag_frame_buffer(file, frameNb);
   apic_data_ apic;
-  U4 i;
+  //U4 i;
 
   if(APIC_valid(data, dataSize, &apic))
     { fprintf(ostream, "(");
-			print_string_str(apic.desc_string_start, apic.desc_string_len-1, true, apic.enc );
+			print_firstString_str(apic.desc_string_start, apic.desc_string_len-1, true, apic.enc );
 			////for(i=0; i<length; i++)   { fprintf(ostream, "%c", data[i]); }
       fprintf(ostream, "), [%s, %d]: ", picType[apic.pic_type], apic.pic_type);
-			print_string_str(apic.mime_string_start, apic.mime_string_len-1, true, 0xFF);
+			print_firstString_str(apic.mime_string_start, apic.mime_string_len-1, true, 0xFF);
 			////for(i=0; i<length; i++)   { fprintf(ostream, "%c", data[i]); }
       fprintf(ostream, " , %d bytes", apic.pic_dataSize); }
 

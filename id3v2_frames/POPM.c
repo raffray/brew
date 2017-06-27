@@ -8,6 +8,7 @@
 #include "err.h"
 #include "str.h"
 #include "text-encoding/utf-8.h"
+#include "text-encoding/utf-8_prints.h"
 
 /*
   <Header for 'Popularimeter', ID: "POPM">
@@ -32,7 +33,7 @@ void print_POPM(mp3File_t *file, U4 frameNb)
   U4 i;
 
   length = text_len(data, dataSize, 0xFF);
-  print_string_str(data, length-1,  true, 0xFF);
+  print_firstString_str(data, length,  true, 0xFF);
   ////for(i=0; i<length; i++)   { fprintf(ostream, "%c", data[i]); }
   counterByteSize = dataSize - (length+1);
 

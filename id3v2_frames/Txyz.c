@@ -8,6 +8,7 @@
 #include "err.h"
 #include "str.h"
 #include "text-encoding/utf-8.h"
+#include "text-encoding/utf-8_prints.h"
 
 /*
 <Header for 'Text information frame', ID: "T000" - "TZZZ", excluding "TXXX"
@@ -31,7 +32,7 @@ void print_Txyz(mp3File_t *file, U4 frameNb)
  // U4  dataSize   = get_id3v2Tag_frame_dataSize(file, frameNb);
   buffer_t * buf = get_id3v2Tag_frame_buffer  (file, frameNb);
 //printf("START PRINTING STRING\n");
-  print_string_buf(buf, false, 0);
+  print_multiString_buf(buf, false, 0);
 //printf("END   PRINTING STRING\n");
 }
 
