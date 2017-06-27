@@ -11,7 +11,7 @@
 #include "frameID.h"
 #include "id3v2_frames/COMM.h"
 #include "id3v2_frames/POPM.h"
-#include "id3v2_frames/Txyz.h"
+#include "id3v2_frames/Text.h"
 #include "id3v2_frames/TCON.h"
 #include "id3v2_frames/TXXX.h"
 #include "id3v2_frames/APIC.h"
@@ -82,7 +82,7 @@ id3_frames[TPE2] = {"TPE2", "Album Artist"}
 id3_frames[TCOM] = {"TCOM", "Composer"};
 id3_frames[TPE3] = {"TPE3", "Conductor"};
 id3_frames[POPM] = {"POPM", "Pop. Meter"};
-id3_frames[TPOS] = {"TPOS" , "Compilation"};
+id3_frames[TPOS] = {"TPOS", "Compilation"};
 id3_frames[TMOO] = {"TMOO", "MOOD"};
 id3_frames[TDAT] = {"TDAT", "Date"};
 id3_frames[TDRC] = {"TDRC", "Rec. Date"};
@@ -97,6 +97,8 @@ UC selectFrames_desc[NB_SELECT_FRAMES][13] = { "Title"    , "Artist"    , "Album
 
 id3v2Tag_frameLink_t *get_id3v2Tag_frame                 (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frameList(file)->ptrList[idx];              }
 U4                    get_id3v2Tag_frame_frameID         (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->frameID;                  }
+buffer_t             *get_id3v2Tag_frame_buffer          (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf;                    }
+UC                   *get_id3v2Tag_frame_data            (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->data;                    }
 U4                    get_id3v2Tag_frame_dataSize        (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->usedSize;                 }
 U4                    get_id3v2Tag_frame_compression_flag(mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->compression_flag; }
 U4                    get_id3v2Tag_frame_decompressedSize(mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->decompressedSize; }
@@ -106,8 +108,6 @@ U4                    get_id3v2Tag_frame_grouping_flag   (mp3File_t *file, U4 id
 U4                    get_id3v2Tag_frame_groupID         (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->         groupID; }
 U4                    get_id3v2Tag_frame_dataLength_flag (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)-> dataLength_flag; }
 U4                    get_id3v2Tag_frame_dataLength      (mp3File_t *file, U4 idx) { return (get_id3v2Tag_frame(file, idx)->info)->      dataLength; }
-UC                   *get_id3v2Tag_frame_data            (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf->data;                    }
-buffer_t             *get_id3v2Tag_frame_buffer          (mp3File_t *file, U4 idx) { return  get_id3v2Tag_frame(file, idx)->buf;                    }
 
 
 UC process_id3v2Tag_frame_flags(mp3File_t *file, frame_info_t *info, buffer_t *buf, U4 end, UC version)
@@ -175,12 +175,7 @@ U4 retrieve_id3v2Tag_frame(mp3File_t *file, buffer_t *tagBuffer)
       buffer_open(frameBuffer   , frameData, frameDataSize);
 
       if (frameInfo->unsync_flag) // only in v4
-	{
-//printf("----- YES 1\n");
-	resyncBuf2(frameBuffer);
-//printf("----- YES 2\n");      exit(42);
-	}
-//printf("----- NO\n");      exit(42);
+				resyncBuf2(frameBuffer);
 
       push_id3v2Tag_frameLink(list, frameID, frameBuffer, frameInfo);
     }
@@ -204,7 +199,7 @@ UC print_id3v2Tag_frame(mp3File_t *file, U4 i)
   */
   if      ( is_TCON_tag(frameID) )  print_TCON(file, i);
   else if ( is_TXXX_tag(frameID) )  print_TXXX(file, i);
-  else if ( is_Txyz_tag(frameID) )  print_Txyz(file, i);
+  else if ( is_Text_tag(frameID) )  print_Text(file, i);
 
   else if ( is_COMM_tag(frameID) )  print_COMM(file, i);
   else if ( is_POPM_tag(frameID) )  print_POPM(file, i);

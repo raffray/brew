@@ -13,7 +13,7 @@ UC is_tag_char_valid(UC);
 UC is_tag_valid (U4);
 UC is_COMM_tag  (U4);
 UC is_POPM_tag  (U4);
-UC is_Txyz_tag  (U4);
+UC is_Text_tag  (U4);
 UC is_TXXX_tag  (U4);
 UC is_TCON_tag  (U4);
 UC is_APIC_tag  (U4);

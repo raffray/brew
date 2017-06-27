@@ -5,7 +5,7 @@
 #include "mp3File.h"
 #include "extern.h"
 #include "byte.h"
-#include "text-encoding/utf-8.h"
+#include "text-encoding/unicode.h"
 #include "err.h"
 #include "str.h"
 

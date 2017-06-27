@@ -9,15 +9,6 @@
 #include "str.h"
 
 
-// PRINT needs
-// 1> print one string
-//
-//
-// 2> print all strings
-//   In case our buffer ends with a block of zeroes,
-
-
-
 void eatZeroes(buffer_t *buf)
 { UC c;
   while(buffer_tell(buf)<buf->usedSize)
@@ -45,7 +36,6 @@ UC print_firstString_str(UC *data, U4 size, UC type_known, UC type_given)
   return print_firstString_buf(&buf, type_known, type_given);
 }
 
-
 UC print_firstString_buf(buffer_t *buffin, UC type_known, UC type_given)
 {
   buffer_t *buf;
@@ -64,18 +54,13 @@ UC print_firstString_buf(buffer_t *buffin, UC type_known, UC type_given)
   return SUCCESS;
 }
 
+
 UC print_multiString_str(UC *data, U4 size, UC type_known, UC type_given)
 { buffer_t buf;
 
   buffer_open  (&buf, data, size);
   return print_multiString_buf(&buf, type_known, type_given);
 }
-
-/*
-
-  00 00 11 11 11 11 00 00 11 00 11 00 00 00
-
-*/
 
 UC print_multiString_buf(buffer_t *buffin, UC type_known, UC type_given)
 {
@@ -92,11 +77,11 @@ UC print_multiString_buf(buffer_t *buffin, UC type_known, UC type_given)
     eatZeroes(buf);
     if(firstString_flag==0)   firstString_flag++;
     else
-      if(buffer_tell(buf)<buf->usedSize) // if we just reached an end-of-string block of zeroes
+      if(buffer_tell(buf)<buf->usedSize) // if we haven't reached an end-of-string block of zeroes
          printf("\n       ");
 
     fprintf(ostream, "%s", buf->data+buffer_tell(buf));
-    findNextZero(buf); //buffer_seek(buf,strlen(buf->data+buffer_tell(buf)),SEEK_CUR);
+    findNextZero(buf);
   }
 
   free(buf->data);

@@ -1,26 +1,17 @@
 #include "frameID.h"
 //#include "byte.h"
 
-UC is_tag_char_valid(UC c)
-{
-  // each of the 4 char of the tag name must be composed of A-Z or 0-9
-  if ( (   (c>0x29) && (c<0x3A))
-       || ((c>0x40) && (c<0x5B)) )
-    return true;
-  return false;
-}
+UC is_tag_char_valid(UC c) // each of the 4 char of the tag name must be composed of A-Z or 0-9
+{ if ( ((c>0x29) && (c<0x3A)) || ((c>0x40) && (c<0x5B)) )   return true;
+  return false; }
 
 UC is_tag_valid(U4 tag)
-{
-  return (is_tag_char_valid   ( (tag & 0x000000FF) )
-	  && is_tag_char_valid( (tag & 0x0000FF00) >>8)
-	  && is_tag_char_valid( (tag & 0x00FF0000) >>16)
-	  && is_tag_char_valid( (tag & 0xFF000000) >>24) );
-}
+{ return (is_tag_char_valid( (tag & 0x000000FF) )
+	     && is_tag_char_valid( (tag & 0x0000FF00) >>8)
+	     && is_tag_char_valid( (tag & 0x00FF0000) >>16)
+	     && is_tag_char_valid( (tag & 0xFF000000) >>24) ); }
 
-
-
-UC is_Txyz_tag(U4 t)   { return ((t!= 0x54585858) && ((t & 0xFF000000) == 0x54000000)); } //  return ( ((t & 0xFF000000) == 0x54000000) );
+UC is_Text_tag(U4 t)   { return ((t!= 0x54585858) && ((t & 0xFF000000) == 0x54000000)); } //  return ( ((t & 0xFF000000) == 0x54000000) );
 UC is_TXXX_tag(U4 t)   { return (t == 0x54585858); }
 UC is_TCON_tag(U4 t)   { return (t == 0x54434F4E); }
 UC is_COMM_tag(U4 t)   { return (t == 0x434F4D4D); }

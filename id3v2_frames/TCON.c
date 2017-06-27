@@ -1,6 +1,6 @@
 #include <ctype.h>
 #include "includes.h"
-#include "Txyz.h"
+#include "Text.h"
 #include "id3v2Tag_frame.h"
 #include "mp3File.h"
 #include "extern.h"

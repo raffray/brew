@@ -21,7 +21,7 @@ OBJS =  mp3Brew.o tests.o \
 	id3v2Tag.o length_map.o mfile.o str.o sync_buf.o wipeFile.o vbrFrame.o \
 	text-encoding/ascii.o text-encoding/iso-8859-1.o text-encoding/utf-16.o text-encoding/utf-8.o \
 	text-encoding/utf-8_prints.o text-encoding/unicode.o \
-	id3v2_frames/APIC.o id3v2_frames/COMM.o id3v2_frames/POPM.o id3v2_frames/TCON.o id3v2_frames/TXXX.o id3v2_frames/Txyz.o
+	id3v2_frames/APIC.o id3v2_frames/COMM.o id3v2_frames/POPM.o id3v2_frames/TCON.o id3v2_frames/TXXX.o id3v2_frames/Text.o
 
 
 

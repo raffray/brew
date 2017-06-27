@@ -8,7 +8,7 @@
 #include "filename.h"
 #include "mp3File.h"
 #include "fileList.h"
-#include "id3v2_frames/Txyz.h"
+#include "id3v2_frames/Text.h"
 #include "str.h"
 
 #define  NB_RENAME_FRAMES  5
@@ -45,11 +45,11 @@ UC  reName_file(fileLink_t *link)
   res =  retrieve_id3v2Tag(&mpFile);
   if(res == FAILURE) return SUCCESS; // <== or FAILURE???
 
-  artist      = get_Txyz_string4rename(&mpFile, "TPE1");
-  albumArtist = get_Txyz_string4rename(&mpFile, "TPE2");
-  album       = get_Txyz_string4rename(&mpFile, "TALB"); //  if(album       == NULL)   album       = "Unknown Album" ;
-  trackNb     = get_Txyz_string4rename(&mpFile, "TRCK");
-  trackName   = get_Txyz_string4rename(&mpFile, "TIT2"); //  if(trackName   == NULL)   trackName   = "Unknown Track" ;
+  artist      = get_Text_string4rename(&mpFile, "TPE1");
+  albumArtist = get_Text_string4rename(&mpFile, "TPE2");
+  album       = get_Text_string4rename(&mpFile, "TALB"); //  if(album       == NULL)   album       = "Unknown Album" ;
+  trackNb     = get_Text_string4rename(&mpFile, "TRCK");
+  trackName   = get_Text_string4rename(&mpFile, "TIT2"); //  if(trackName   == NULL)   trackName   = "Unknown Track" ;
 
   buffer_init_default(&buf);
 

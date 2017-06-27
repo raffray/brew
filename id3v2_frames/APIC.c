@@ -69,12 +69,12 @@ void print_APIC(mp3File_t *file, U4 frameNb)
 
 
 void extract_APIC(mp3File_t *file, U4 frameNb)
-{ UC *data     = get_id3v2Tag_frame_data    (file, frameNb);
+{ UC   *data     = get_id3v2Tag_frame_data    (file, frameNb);
   U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
   char *filename = get_filename(file);
   apic_data_ apic;
   char *pic;
-  char*pic_name;
+  char *pic_name;
   FILE *fp;
 
   if(APIC_valid(data, dataSize, &apic))
@@ -87,7 +87,8 @@ void extract_APIC(mp3File_t *file, U4 frameNb)
       pic = malloc(apic.pic_dataSize);
       memcpy(pic, apic.picture_start, apic.pic_dataSize);
       fwrite(pic, 1, apic.pic_dataSize, fp);
-      free(pic);
+			free(pic);
+			free(pic_name);
       fclose(fp);
     }
 }
