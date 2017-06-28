@@ -1,4 +1,6 @@
+.gitignore
 *.o
 *~
 mp3Brew
 logfile
+specs and notes
