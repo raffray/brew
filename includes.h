@@ -29,10 +29,6 @@
 #define NL  0x0A
 #define SP  0x20
 
-
-#define Fprintf(str     ) fprintf(ostream, str)
-#define Fprintf2(str, arg) fprintf(ostream, str, arg)
-
 #define ALL      0
 #define SELECT   1
 #define TRACK    2

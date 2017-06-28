@@ -31,10 +31,4 @@ VD check_id3v1_xtdTag_presence  (mp3File_t *);
 UC retrieve_id3v1_xtdTag        (mp3File_t *);
 UC print_id3v1_xtdTag           (mp3File_t *);
 
-
-
-UC is_id3v1_xtd_present(mp3File_t *);
-UC print_id3v1_xtd_info(mp3File_t *);
-
-
 #endif // ID3V1_XTD_

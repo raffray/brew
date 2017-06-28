@@ -33,8 +33,8 @@ $(TARGET) : $(OBJS)
 byte.o:
 	${CC} ${CFLAGS} -o is_big_endian is_big_endian.c
 	@ ./is_big_endian; if [ $$? -eq 0 ] ; \
-	then $(CC) -c $(CFLAGS) -DLITTLE_ENDIAN byte.c -o byte.o; echo $(CC) -c $(CFLAGS) -DL_ENDIAN byte.c -o byte.o; \
-	else $(CC) -c $(CFLAGS)            byte.c -o byte.o; echo $(CC) -c $(CFLAGS)            byte.c -o byte.o; fi
+	then $(CC) $(CFLAGS) -c -DLITTLE_ENDIAN byte.c -o byte.o; echo $(CC) $(CFLAGS) -c -DL_ENDIAN byte.c -o byte.o; \
+	else $(CC) $(CFLAGS) -c byte.c -o byte.o; echo $(CC) $(CFLAGS) -c byte.c -o byte.o; fi
 	@rm ./is_big_endian
 
 .c.o :

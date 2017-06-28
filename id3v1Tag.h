@@ -1,5 +1,5 @@
-#ifndef ID3V1_
-#define ID3V1_
+#ifndef ID3V1TAG_
+#define ID3V1TAG_
 
 #include "includes.h"
 #include "brew_types.h"
@@ -14,8 +14,8 @@ comment 	28[4] or 30 	The comment.
 zero-byte[4] 	1 	If a track number is stored, this byte contains a binary 0.
 track[4] 	1 	The number of the track on the album, or 0. Invalid, if previous byte is not a binary 0.
 genre 	1 	Index in a list of genres, or 255
-
 */
+
 typedef struct id3v1Tag
 { UC presenceFlag;
   UC title  [31];
@@ -33,6 +33,4 @@ VD check_id3v1Tag_presence  (mp3File_t *);
 UC retrieve_id3v1Tag        (mp3File_t *);
 UC print_id3v1Tag           (mp3File_t *);
 
-
-
-#endif // ID3V1_
+#endif // ID3V1TAG_

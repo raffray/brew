@@ -61,14 +61,14 @@ FILE        *ostream;       // either stdout or a logfile
 
 UC            option;
 UC printWarnings_flag = false;
-UC        hasWarning = false;
+UC         hasWarning = false;
 
 
 UC (*funcs[OPTION_COUNT])   (fileLink_t *link);
 UC doNothing                (fileLink_t *link)   { return pExit("Invalid option [print usage]"); }
 
 
-/* NEXT feature... extract TPIC into filename.jpg (overwrite if exists) */
+/* NEXT feature... extract APIC into filename.jpg (overwrite if exists) */
 /*               */
 /* During wipe??? */
 
@@ -102,8 +102,6 @@ UC dispatch(int argc, char **argv)
 //                    [-v2]         ... more  debugging info (extra dev tests)
 //
 // we process the number of args we expect, ignoring possible extra ones
-
-//  getCpuEndianNess();
 
   if(argc<3)  return pExit("Error, expecting file/directory argument");
   option = isFlag(argv[1]);
@@ -157,9 +155,11 @@ UC dispatch(int argc, char **argv)
     *     Might want to add to -s option to warn about non constant length too...
    */
 
-  return processFiles(argv[2], funcs[option]);
+  generateFileList(argv[2]);
 
-  return SUCCESS;
+//  printFileList_2(&good_fList); exit(42);
+
+  return processFiles(funcs[option]);
 }
 
 void postDispatch()
@@ -170,8 +170,6 @@ void postDispatch()
 int main(int argc, char **argv)
 {
   ostream = stdout;
-//  Fprintf2("====> --- Filename: %s\n", argv[2]);
-//  exit(42);
 
   tests(argc, argv); // <== to remove
 
@@ -204,7 +202,7 @@ UC test_file(fileLink_t *link)
 //  printU4(get_stream_start_offset(&mpFile), NL);
 //  printU4(get_firstFrame_offset  (&mpFile), NL); exit(42);
 
-  if (  retrieve_id3v2Tag(         &mpFile) == FAILURE)   { closeMp3File(&mpFile);   return SUCCESS; }
+  if (retrieve_id3v2Tag(&mpFile) == FAILURE)   { closeMp3File(&mpFile);   return SUCCESS; }
 
   print_id3v2Tag(&mpFile);
   closeMp3File(&mpFile);

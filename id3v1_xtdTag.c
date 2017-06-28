@@ -8,7 +8,6 @@
 #include "mfile.h"
 #include "err.h"
 
-
 UC get_id3v1_xtdTag_presenceFlag(mp3File_t *file)   { return (file->id3v1_xtdTag).presenceFlag; }
 
 VD check_id3v1_xtdTag_presence(mp3File_t *file)
@@ -46,17 +45,12 @@ UC retrieve_id3v1_xtdTag(mp3File_t *file)
 UC print_id3v1_xtdTag(mp3File_t *file)
 { id3v1_xtdTag_t *tag = &(file->id3v1_xtdTag);
 
-  /* Tags can utilise extended ascii characters too */
+  /* Tags can use extended ascii characters too */
 
   if( !tag->presenceFlag ) return FAILURE;
 
-  Fprintf("\n*******\nId3v1 Tag ****\n");
+  fprintf(ostream, "\n*******\nId3v1 Tag ****\n");
 
-  /*
-  fprintf(ostream, "Title   : ");   print\_string(tag->title  , strlen(tag->title  ), true, 0);   fprintf(ostream, "\n");
-  fprintf(ostream, "Artist  : ");   print\_string(tag->artist , strlen(tag->artist ), true, 0);   fprintf(ostream, "\n");
-  fprintf(ostream, "Album   : ");   print\_string(tag->album  , strlen(tag->album  ), true, 0);   fprintf(ostream, "\n");
-  */
   fprintf(ostream, "Title   : %s\n", tag->title);
   fprintf(ostream, "Artist  : %s\n", tag->artist);
   fprintf(ostream, "Album   : %s\n", tag->album);
@@ -74,63 +68,3 @@ UC print_id3v1_xtdTag(mp3File_t *file)
 
   return SUCCESS;
 }
-
-
-
-
-
-
-/*
-UC is_id3v1_xtd_present(mp3File_t *file)
-{ U4 tag;
-
-  if (        get_fileSize(file) < ID3V1_TAG_LENGTH + XTD_TAG_LENGTH) { return pExit("not an mp3 file\n"); }
-  if (!get_id3v1Tag_presenceFlag(file))   return false;
-  mseek(file, - ID3V1_TAG_LENGTH - XTD_TAG_LENGTH, SEEK_END);
-  mreadU4(file, &tag);
-  if(tag != 0x5441472B)   return false;
-
-  return true;
-}
-
-UC print_id3v1_xtd_info(mp3File_t *file)
-{ char buf[61];
-  UC speed;
-
-
-  if( !get_id3v1Tag_presenceFlag    (file) ) return FAILURE;
-  if( !is_id3v1_xtd_present(file) ) return FAILURE;
-
-  Fprintf("\n*******\nId3v1 Extended Tag\n");
-
-  mseek(file, - ID3V1_TAG_LENGTH - 4, SEEK_END);
-  mreadStr(file, buf, 60);   buf[30] = '\0';   fprintf(ostream, "Title      : %s\n", buf);
-  mreadStr(file, buf, 60);   buf[30] = '\0';   fprintf(ostream, "Artist     : %s\n", buf);
-  mreadStr(file, buf, 60);   buf[30] = '\0';   fprintf(ostream, "Album      : %s\n", buf);
-  mreadUC (file, &speed );                     fprintf(ostream, "Speed      : "         );
-  switch(speed)
-    {
-    case   0:                                    fprintf(ostream,    "Unset\n");   break;
-    case   1:                                    fprintf(ostream,     "Slow\n");   break;
-    case   2:                                    fprintf(ostream,   "Medium\n");   break;
-    case   3:                                    fprintf(ostream,     "Fast\n");   break;
-    case   4:                                    fprintf(ostream, "Hardcore\n");   break;
-    default :                                    fprintf(ostream,        "?\n");   break;
-    }
-
-  mreadStr(file, buf, 60);   buf[30] = '\0';   fprintf(ostream, "Genre      : %s\n", buf);
-  mreadStr(file, buf,  6);   buf[6]  = '\0';   fprintf(ostream, "Start Time : %s\n", buf);
-  mreadStr(file, buf,  6);   buf[6]  = '\0';   fprintf(ostream, "End   Time : %s\n", buf);
-
-
-//  mreadStr(file, buf, 28);   buf[28] = '\0';   fprintf(ostream, "Comment : %s"  , buf);
-//  mreadUC (&flag  );   mreadUC (&track );   mreadUC (&genre );
-//  if(flag!=0)                                  fprintf(ostream, "%c%c\n", flag    , track);   // the end of the comment
-//  else                                         fprintf(ostream, "\nTrack#  : %d\n", track);
-  ////                                         fprintf(ostream, "Genre   : %s (%d)\n", tconArray[genre], genre);
-
-  Fprintf("*******\n");
-
-  return SUCCESS;
-}
-*/

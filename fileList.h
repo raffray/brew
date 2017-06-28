@@ -26,12 +26,13 @@ void      push_file_link(fileList_t *, char *, U4);
 void create_file_ptrList(fileList_t *);
 void     clean_file_list(fileList_t *);
 
-void printFileList_1(fileList_t *);
-void printFileList_2(fileList_t *);
+//void printFileList_1(fileList_t *);
+//void printFileList_2(fileList_t *);
 
 int filenameCmp(const void *, const void *);
-UC addFilenameToList(fileList_t *, char *, UC);
-UC      processFiles(char *, UC (*)(fileLink_t *));
-VD generateFileLists(char *);
+UC test_and_addFileToList(fileList_t *, char *, UC);
+UC      processFiles(UC (*)(fileLink_t *));
+UC generateFileList(char *);
+UC addFilesFromDir(char *);
 
 #endif // FILE_LIST_
