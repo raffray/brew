@@ -195,19 +195,11 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
 
   if(fileCount == 0) { Fprintf("No file to process\n"); return FAILURE; }
   if(fileCount==1)
-    { //      if (option == R)   if(isRegFile(backupFilename) == false)   pExit("Cannot perform restore: backup file does not exist");
-//      if ((option == B) || (option == R))  TRY( setMp3File(&buFile,   backupFilename, 0, FSTREAM) ,  Fprintf2("Could not open file \"%s\"\n", backupFilename););
-//      printf("START "); printU4(get_stream_start_offset(file), NL);
-      TRY(func(good_fList.ptrList[0]) , {})
-//      if ((option == B) || (option == R))     closeMp3File(&buFile);
-    }
+    {      TRY(func(good_fList.ptrList[0]) , {})    }
   else
     {
       qsort(good_fList.ptrList, fileCount, sizeof(fileLink_t *), filenameCmp);
       Fprintf2("Processing %"PRId32" file(s)\n", fileCount); // <== printf too??
-
-//      if (option == R)   if(isRegFile(backupFilename) == false)   pExit("Cannot perform restore: backup file does not exist");
-//      if ((option == B) || (option == R))  TRY( setMp3File(&buFile,   backupFilename, 0, FSTREAM) ,  Fprintf2("Could not open file \"%s\"\n", backupFilename););
 
       for(i=0; i<fileCount; i++)
 	{ if( printWarnings_flag == false ) //!( (option==E) && (printMode==SCAN)) )
@@ -235,7 +227,6 @@ UC processFiles(char *name, UC (*func)(fileLink_t *))
 
 	  if( !( (option==E) && (printMode==SCAN)) )   Fprintf("\n");
 	}
-//      if (option == B)   closeMp3File(&buFile);
 
       printf("\n");
       Fprintf2("%"PRId32" file(s) processed\n", fileCount); // <== printf too?
@@ -286,7 +277,7 @@ void generateFileLists(char *path)
 		  if( ((strlen(entry_string)-4)>0) && ( (   strcmp(entry_string+strlen(entry_string)-4, ".mp1")==0)
 							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp2")==0)
 							|| (strcmp(entry_string+strlen(entry_string)-4, ".mp3")==0)
-							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0)
+							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP1")==0)
 							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP2")==0)
 							|| (strcmp(entry_string+strlen(entry_string)-4, ".MP3")==0) ) )
 		    {
