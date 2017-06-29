@@ -132,6 +132,7 @@ void printFileList_2(fileList_t *list)
     fprintf(ostream, "%s [ ] %d\n", list->ptrList[i]->filename, list->ptrList[i]->offset);
 }
 */
+
 int filenameCmp(const void * a, const void * b)   { return strcmp( (*(fileLink_t **)a)->filename, (*(fileLink_t **)b)->filename ); }
 
 
@@ -165,25 +166,24 @@ UC testFileExtension(char *filename)
 	return FAILURE;
 }
 
-
-
 UC processFiles(UC (*func)(fileLink_t *))
 {
   U4 i;
   U4 fileCount = good_fList.fileCount;
 
   if(fileCount == 0) { fprintf(ostream, "No file to process\n"); return FAILURE; }
-  if(fileCount==1)
+  if(fileCount == 1)
     {      TRY(func(good_fList.ptrList[0]) , {})    }
   else
     {
+			printf("\nFiles to be processed... %5d\n", good_fList.fileCount);
       qsort(good_fList.ptrList, fileCount, sizeof(fileLink_t *), filenameCmp);
-      fprintf(ostream, "Processing %"PRId32" file(s)\n", fileCount); // <== printf too??
+      fprintf(ostream, "Processing %"PRId32" file(s)\n", fileCount);
 
       for(i=0; i<fileCount; i++)
-	{ if( printWarnings_flag == false ) //!( (option==E) && (printMode==SCAN)) )
-	    fprintf(ostream, "====> --- Filename: %s\n", good_fList.ptrList[i]->filename);
-	  printf("\rprogress: %"PRId32"/%"PRId32"", ++fileNb, good_fList.fileCount);   fflush(stdout);
+			{ if( printWarnings_flag == false ) //!( (option==E) && (printMode==SCAN)) )
+	        fprintf(ostream, "====> --- Filename: %s\n", good_fList.ptrList[i]->filename);
+	  		printf("\rprogress: %"PRId32"/%"PRId32"", ++fileNb, good_fList.fileCount);   fflush(stdout);
 
 
 
@@ -205,10 +205,9 @@ UC processFiles(UC (*func)(fileLink_t *))
 	    /**/hasWarning = false;
 
 	  if( !( (option==E) && (printMode==SCAN)) )   fprintf(ostream, "\n");
-	}
+		}
 
-      printf("\n");
-      fprintf(ostream, "%"PRId32" file(s) processed\n", fileCount); // <== printf too?
+		printf("\nFiles processed......... %5"PRId32"\n", fileCount); // <== printf too?
     }
 
   return SUCCESS;
@@ -263,10 +262,8 @@ UC addFilesFromDir(char *path)
 		    			{ if( (entry_stat.st_mode & S_IXUSR) && (entry_stat.st_mode & S_IRUSR) )  // READ and EXECUTE rights
 								addFilesFromDir(entry_string); } }
 	      		else if (S_ISREG(entry_stat.st_mode))// it's a file
-						{
-		  				//printf("\r%s %d files checked", progressStr[rank%10], rank); fflush(stdout);
-		  				printf("\r%5d files checked", rank); fflush(stdout);
-		  				rank++;
+						{ printf("\rFiles checked........... %5d", rank); fflush(stdout);
+						  rank++;
 		  				// default, we only process likely-to-be-ok files
 		  				if(testFileExtension(entry_string) == SUCCESS)
 		    				test_and_addFileToList(&good_fList, entry_string, true);

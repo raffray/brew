@@ -1,7 +1,8 @@
 #include "buffer.h"
 #include "byte.h"
+#include "extern.h"
 
-#define MIN_BUFF_SIZE 2048
+#define MIN_BUFF_SIZE 128//2048
 
 UC buffer_expand(buffer_t *buf, U4 dataSize)   // dataSize is the size of data we want to write
 { U4 neededSize;
@@ -68,16 +69,16 @@ void buffer_print(buffer_t *buf)
 
   for(i=0; i<nbLines    ; i++)
     { for(j=0; j<16       ; j++)
-	     if((j+i      *16)<buf->usedSize)
-	      printUC(      *(buf->data +j+i      *16), SP);
-	       else printf(".. ");
-         printf("\n"); }
-  for    (j=0; j<remainder; j++)
-    if((j+nbLines*16)<buf->usedSize)
-      printUC(          *(buf->data +j+nbLines*16), SP);
-    else printf(".. ");
-  printf("\n\n");
-}
+	      if((j+i      *16)<buf->usedSize)
+	        printUC(      *(buf->data +j+i      *16), SP);
+	      else fprintf(ostream, ".. ");
+          fprintf(ostream, "\n"); }
+      for    (j=0; j<remainder; j++)
+        if((j+nbLines*16)<buf->usedSize)
+          printUC(          *(buf->data +j+nbLines*16), SP);
+        else fprintf(ostream, ".. ");
+      fprintf(ostream, "\n\n");
+   }
 
 UC buffer_read(buffer_t *buf, void *str, U4 len)
 {

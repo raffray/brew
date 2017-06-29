@@ -78,8 +78,7 @@ UC print_multiString_buf(buffer_t *buffin, UC type_known, UC type_given)
     if(firstString_flag==0)   firstString_flag++;
     else
       if(buffer_tell(buf)<buf->usedSize) // if we haven't reached an end-of-string block of zeroes
-         printf("\n       ");
-
+        fprintf(ostream, "\n      ");
     fprintf(ostream, "%s", buf->data+buffer_tell(buf));
     findNextZero(buf);
   }
