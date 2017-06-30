@@ -73,21 +73,23 @@ void extract_APIC(mp3File_t *file, U4 frameNb)
   U4    dataSize = get_id3v2Tag_frame_dataSize(file, frameNb);
   char *filename = get_filename(file);
   apic_data_ apic;
-  char *pic;
   char *pic_name;
   FILE *fp;
 
   if(APIC_valid(data, dataSize, &apic))
     {
       pic_name = malloc(strlen(filename) + 3 + strlen(picType[apic.pic_type]) +4 +1);
-      sprintf(pic_name, "%s - %s.jpg", filename, picType[apic.pic_type]);
+
+			// Quick and dirty. Will do for now
+			if (strcmp((char*)apic.mime_string_start, "image/png")==0)
+        sprintf(pic_name, "%s - %s.png", filename, picType[apic.pic_type]);
+			else
+        sprintf(pic_name, "%s - %s.jpg", filename, picType[apic.pic_type]);
 
       fp = fopen(pic_name, "w");
 
-      pic = malloc(apic.pic_dataSize);
-      memcpy(pic, apic.picture_start, apic.pic_dataSize);
-      fwrite(pic, 1, apic.pic_dataSize, fp);
-			free(pic);
+      fwrite(apic.picture_start, 1, apic.pic_dataSize, fp);
+
 			free(pic_name);
       fclose(fp);
     }
