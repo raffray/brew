@@ -43,7 +43,7 @@
 
 // 22 is the maximum length of strings. for: 140. Contemporary Christian
 UC tconArray[256][22]={
-					 "Blues"                 , "Classic Rock"         , "Country"          , "Dance"           , "Disco"          ,
+		       "Blues"                 , "Classic Rock"         , "Country"          , "Dance"           , "Disco"          ,
 		       "Funk"                  , "Grunge"               , "Hip-Hop"          , "Jazz"            , "Metal"          ,
 		       "New Age"               , "Oldies"               , "Other"            , "Pop"             , "R&B"            ,
 		       "Rap"                   , "Reggae"               , "Rock"             , "Techno"          , "Industrial"     ,

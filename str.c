@@ -14,7 +14,7 @@ U4 text_len(UC *text, U4 limit, UC type)
   switch(type)
     {
     case 1  :
-    case 2  : return   text_len_2Bytes(text, limit);   break;
+    case 2  : return   text_len_2Bytes(text, limit);   break; // UTF-16 and UTF-16BE
     default : return   text_len_1Byte (text, limit);   break;
     }
 }
